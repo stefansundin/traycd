@@ -21,11 +21,13 @@
 #include <mmsystem.h>
 
 //Tray messages
-#define WM_ICONTRAY WM_USER+1
-#define SWM_TOGGLE  WM_APP+1
-#define SWM_SPIN    WM_APP+2
-#define SWM_ABOUT   WM_APP+3
-#define SWM_EXIT    WM_APP+4
+#define WM_ICONTRAY       WM_USER+1
+#define SWM_TOGGLE        WM_APP+1
+#define SWM_SPIN          WM_APP+2
+#define SWM_AUTOSTART_ON  WM_APP+3
+#define SWM_AUTOSTART_OFF WM_APP+4
+#define SWM_ABOUT         WM_APP+5
+#define SWM_EXIT          WM_APP+6
 
 //Stuff
 LPSTR szClassName="TrayCD";
@@ -34,6 +36,8 @@ LRESULT CALLBACK MyWndProc(HWND, UINT, WPARAM, LPARAM);
 //Global info
 static HICON icon[4];
 static NOTIFYICONDATA traydata;
+static UINT WM_TASKBARCREATED;
+static int tray_added=0;
 static int iconpos=0;
 static int eject=1;
 
@@ -66,6 +70,12 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	//ShowWindow(hWnd, iCmdShow); //Show
 	//UpdateWindow(hWnd); //Update
 	
+	//Register TaskbarCreated so we can readd the tray icon if explorer.exe crashes
+	if ((WM_TASKBARCREATED=RegisterWindowMessage("TaskbarCreated")) == 0) {
+		sprintf(msg,"RegisterWindowMessage() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
+		MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
+	}
+	
 	//Load icons
 	char iconname[6];
 	for (iconpos=0; iconpos < 4; iconpos++) {
@@ -91,11 +101,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	traydata.hIcon=icon[iconpos];
 	
 	//Add tray icon
-	if (Shell_NotifyIcon(NIM_ADD,&traydata) == FALSE) {
-		sprintf(msg,"Shell_NotifyIcon() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
-		MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
-		return 1;
-	}
+	AddTray();
 
 	//Message loop
 	MSG msg;
@@ -109,7 +115,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 void ShowContextMenu(HWND hWnd) {
 	POINT pt;
 	GetCursorPos(&pt);
-	HMENU hMenu, hAutostartMenu;
+	HMENU hMenu;
 	if ((hMenu = CreatePopupMenu()) == NULL) {
 		sprintf(msg,"CreatePopupMenu() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
 		MessageBox(NULL, msg, "KillKeys Warning", MB_ICONWARNING|MB_OK);
@@ -120,6 +126,43 @@ void ShowContextMenu(HWND hWnd) {
 	
 	//Spin icon (just for fun)
 	InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_SPIN, "Spin icon");
+	
+	//Autostart
+	//Check registry
+	int autostart=0;
+	//Open key
+	HKEY key;
+	if (RegOpenKeyEx(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\Run",0,KEY_QUERY_VALUE,&key) != ERROR_SUCCESS) {
+		sprintf(msg,"RegOpenKeyEx() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
+		MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
+	}
+	//Read value
+	char autostart_value[MAX_PATH+10];
+	DWORD len=sizeof(autostart_value);
+	DWORD res=RegQueryValueEx(key,"TrayCD",NULL,NULL,(LPBYTE)autostart_value,&len);
+	if (res != ERROR_FILE_NOT_FOUND && res != ERROR_SUCCESS) {
+		sprintf(msg,"RegQueryValueEx() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
+		MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
+	}
+	//Close key
+	if (RegCloseKey(key) != ERROR_SUCCESS) {
+		sprintf(msg,"RegCloseKey() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
+		MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
+	}
+	//Get path
+	char path[MAX_PATH];
+	if (GetModuleFileName(NULL,path,sizeof(path)) == 0) {
+		sprintf(msg,"GetModuleFileName() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
+		MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
+	}
+	//Compare
+	char pathcmp[MAX_PATH+10];
+	sprintf(pathcmp,"\"%s\"",path);
+	if (!strcmp(pathcmp,autostart_value)) {
+		autostart=1;
+	}
+	//Add to menu
+	InsertMenu(hMenu, -1, MF_BYPOSITION|(autostart?MF_CHECKED:0), (autostart?SWM_AUTOSTART_OFF:SWM_AUTOSTART_ON), "Autostart");
 	InsertMenu(hMenu, -1, MF_BYPOSITION|MF_SEPARATOR, SWM_ABOUT, "");
 	
 	//About
@@ -133,6 +176,38 @@ void ShowContextMenu(HWND hWnd) {
 
 	TrackPopupMenu(hMenu, TPM_BOTTOMALIGN, pt.x, pt.y, 0, hWnd, NULL );
 	DestroyMenu(hMenu);
+}
+
+int AddTray() {
+	if (tray_added) {
+		//Tray already added
+		return 1;
+	}
+	
+	if (Shell_NotifyIcon(NIM_ADD,&traydata) == FALSE) {
+		sprintf(msg,"Shell_NotifyIcon() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
+		MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
+		return 1;
+	}
+	
+	//Success
+	tray_added=1;
+}
+
+int RemoveTray() {
+	if (!tray_added) {
+		//Tray not added
+		return 1;
+	}
+	
+	if (Shell_NotifyIcon(NIM_DELETE,&traydata) == FALSE) {
+		sprintf(msg,"Shell_NotifyIcon() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
+		MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
+		return 1;
+	}
+	
+	//Success
+	tray_added=0;
 }
 
 void ToggleCD() {
@@ -168,6 +243,59 @@ void RotateIcon(double howlong) {
 	}
 }
 
+void AddAutostart() {
+	//Open key
+	HKEY key;
+	if (RegOpenKeyEx(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\Run",0,KEY_SET_VALUE,&key) != ERROR_SUCCESS) {
+		sprintf(msg,"RegOpenKeyEx() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
+		MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
+		return;
+	}
+	//Get path
+	char path[MAX_PATH];
+	if (GetModuleFileName(NULL,path,sizeof(path)) == 0) {
+		sprintf(msg,"GetModuleFileName() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
+		MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
+		return;
+	}
+	//Add
+	char value[MAX_PATH+10];
+	sprintf(value,"\"%s\"",path);
+	if (RegSetValueEx(key,"TrayCD",0,REG_SZ,value,strlen(value)+1) != ERROR_SUCCESS) {
+		sprintf(msg,"RegSetValueEx() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
+		MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
+		return;
+	}
+	//Close key
+	if (RegCloseKey(key) != ERROR_SUCCESS) {
+		sprintf(msg,"RegCloseKey() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
+		MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
+		return;
+	}
+}
+
+void RemoveAutostart() {
+	//Open key
+	HKEY key;
+	if (RegOpenKeyEx(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\Run",0,KEY_SET_VALUE,&key) != ERROR_SUCCESS) {
+		sprintf(msg,"RegOpenKeyEx() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
+		MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
+		return;
+	}
+	//Remove
+	if (RegDeleteValue(key,"TrayCD") != ERROR_SUCCESS) {
+		sprintf(msg,"RegDeleteValue() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
+		MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
+		return;
+	}
+	//Close key
+	if (RegCloseKey(key) != ERROR_SUCCESS) {
+		sprintf(msg,"RegCloseKey() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
+		MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
+		return;
+	}
+}
+
 LRESULT CALLBACK MyWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	if (msg == WM_COMMAND) {
 		int wmId=LOWORD(wParam), wmEvent=HIWORD(wParam);
@@ -178,8 +306,14 @@ LRESULT CALLBACK MyWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		else if (wmId == SWM_SPIN) {
 			RotateIcon(5);
 		}
+		else if (wmId == SWM_AUTOSTART_ON) {
+			AddAutostart();
+		}
+		else if (wmId == SWM_AUTOSTART_OFF) {
+			RemoveAutostart();
+		}
 		else if (wmId == SWM_ABOUT) {
-			MessageBox(NULL, "TrayCD - 0.1\nhttp://traycd.googlecode.com/\nrecover89@gmail.com\n\nFor lazy people who don't want to stretch their arm to their cd tray.\n\nSend feedback to recover89@gmail.com", "About TrayCD", MB_ICONINFORMATION|MB_OK);
+			MessageBox(NULL, "TrayCD - 0.2\nhttp://traycd.googlecode.com/\nrecover89@gmail.com\n\nEject and insert the cd tray via the tray icon.\n\nSend feedback to recover89@gmail.com", "About TrayCD", MB_ICONINFORMATION|MB_OK);
 		}
 		else if (wmId == SWM_EXIT) {
 			DestroyWindow(hWnd);
@@ -194,12 +328,13 @@ LRESULT CALLBACK MyWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			ShowContextMenu(hWnd);
 		}
 	}
+	else if (msg == WM_TASKBARCREATED) {
+		tray_added=0;
+		AddTray();
+	}
 	else if (msg == WM_DESTROY) {
-		if (Shell_NotifyIcon(NIM_DELETE,&traydata) == FALSE) {
-			char msg[100];
-			sprintf(msg,"Shell_NotifyIcon() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
-			MessageBox(NULL, msg, "TrayCD Warning", MB_ICONWARNING|MB_OK);
-			return 1;
+		if (tray_added) {
+			RemoveTray();
 		}
 		PostQuitMessage(0);
 		return 0;

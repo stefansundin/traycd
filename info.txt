@@ -1,0 +1,14 @@
+TrayCD
+http://traycd.googlecode.com/
+recover89@gmail.com
+
+Eject and insert the cd tray via the tray icon.
+
+Changelog
+---------
+0.2:
+Added autostart option.
+Tray icon is now readded when explorer crashes.
+
+0.1:
+Initial release.
