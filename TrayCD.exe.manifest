@@ -3,9 +3,8 @@
 <assemblyIdentity
 	version="1.0.0.0"
 	processorArchitecture="X86"
-	name="TrayCD"
+	name="XP style"
 	type="win32" />
-<description>TrayCD</description>
 <dependency>
 	<dependentAssembly>
 		<assemblyIdentity

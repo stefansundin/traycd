@@ -2,10 +2,14 @@ TrayCD
 http://traycd.googlecode.com/
 recover89@gmail.com
 
-Eject and insert the cd tray via the tray icon.
+Eject and insert the cd tray via a tray icon.
 
 Changelog
 ---------
+0.3:
+Can now manage multiple cdrom drives.
+Use middle click on tray to open second drive.
+
 0.2:
 Added autostart option.
 Tray icon is now readded when explorer crashes.
