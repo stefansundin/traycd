@@ -15,7 +15,7 @@ New icons by Onyx Reyes, licensed under CC-BY-SA.
 
 0.2:
 Added autostart option.
-Tray icon is now readded when explorer crashes.
+Tray icon is now re-added when explorer crashes.
 
 0.1:
 Initial release.
