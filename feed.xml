@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<id>urn:uuid:fd9e875d-86de-4e51-9166-947048552b29</id>
+	<title>TrayCD</title>
+	<link href="http://traycd.googlecode.com/svn/wiki/feed.xml" rel="self" />
+	<link href="http://code.google.com/p/traycd/" />
+	<updated>2008-11-16T01:18:00Z</updated>
+	<author>
+		<name>Stefan Sundin</name>
+		<email>recover89@gmail.com</email>
+	</author>
+
+	<entry>
+		<id>urn:uuid:e6aa21f2-7708-4182-8c64-d8e895aa7f7b</id>
+		<title>TrayCD - 0.3</title>
+		<link href="http://code.google.com/p/traycd/downloads/detail?name=TrayCD-0.3.7z" />
+		<updated>2008-11-16T01:18:00Z</updated>
+		<content type="text">
+Changelog:
+* Can now manage multiple cdrom drives.
+* Use middle click on tray to open second drive.
+* New icons by Onyx Reyes, licensed under CC-BY-SA.
+		</content>
+	</entry>
+
+	<entry>
+		<id>urn:uuid:7d5204b3-4e7f-41ad-9ecf-76ab18d77b3d</id>
+		<title>This feed</title>
+		<link href="http://code.google.com/p/traycd/" />
+		<updated>2008-11-16T01:15:00Z</updated>
+		<content type="html">
+Hi everyone.&lt;br/>
+This feed will let you know when there's any update to TrayCD.&lt;br/>
+There's also another feed available &lt;a href="http://superf4.googlecode.com/svn/wiki/all.xml">here&lt;/a> which will let you know if there's an update to any of programs.&lt;br/>
+You can take a look at all my programs &lt;a href="http://code.google.com/u/recover89/">here&lt;/a>.
+		</content>
+	</entry>
+</feed>
