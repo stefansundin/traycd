@@ -1,7 +1,19 @@
-icon0 ICON media/icon0.ico
-icon1 ICON media/icon1.ico
-icon2 ICON media/icon2.ico
-icon3 ICON media/icon3.ico
+icon ICON media/icon.ico
+tray00 ICON media/tray00.ico
+tray01 ICON media/tray01.ico
+tray02 ICON media/tray02.ico
+tray03 ICON media/tray03.ico
+tray04 ICON media/tray04.ico
+tray05 ICON media/tray05.ico
+tray06 ICON media/tray06.ico
+tray07 ICON media/tray07.ico
+tray08 ICON media/tray08.ico
+tray09 ICON media/tray09.ico
+tray10 ICON media/tray10.ico
+tray11 ICON media/tray11.ico
+tray12 ICON media/tray12.ico
+tray13 ICON media/tray13.ico
+tray14 ICON media/tray14.ico
 
 #define CREATEPROCESS_MANIFEST_RESOURCE_ID 1
 #define RT_MANIFEST 24

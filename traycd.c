@@ -34,7 +34,7 @@
 //Stuff
 LRESULT CALLBACK MyWndProc(HWND, UINT, WPARAM, LPARAM);
 
-static HICON icon[4];
+static HICON icon[15];
 static NOTIFYICONDATA traydata;
 static UINT WM_TASKBARCREATED;
 static int tray_added=0;
@@ -69,23 +69,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	//Create window
 	HWND hwnd=CreateWindow(wnd.lpszClassName, "TrayCD", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInst, NULL);
 	
-	//Check for CD drives
-	DWORD drives=GetLogicalDrives();
-	int bitmask=1;
-	char driveletters[]="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	int i;
-	for (i=0; i < strlen(driveletters); i++) {
-		open[i]=0;
-		if (drives&bitmask) {
-			char drive[]="X:\\";
-			drive[0]=driveletters[i];
-			if (GetDriveType(drive) == DRIVE_CDROM) {
-				sprintf(cdrom,"%s%c",cdrom,driveletters[i]);
-			}
-		}
-		bitmask=bitmask << 1;
-	}
-	
 	//Register TaskbarCreated so we can re-add the tray icon if explorer.exe crashes
 	if ((WM_TASKBARCREATED=RegisterWindowMessage("TaskbarCreated")) == 0) {
 		sprintf(txt,"RegisterWindowMessage() failed (error code: %d) in file %s, line %d.\nThis means the tray icon won't be added if (or should I say when) explorer.exe crashes.",GetLastError(),__FILE__,__LINE__);
@@ -93,11 +76,11 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	}
 	
 	//Load icons
-	char iconname[]="iconX";
-	for (iconpos=0; iconpos < 4; iconpos++) {
-		sprintf(iconname, "icon%d", iconpos);
+	char iconname[]="trayXX";
+	for (iconpos=0; iconpos < 14; iconpos++) {
+		sprintf(iconname+4, "%02d", iconpos);
 		if ((icon[iconpos] = LoadImage(hInst, iconname, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR)) == NULL) {
-			sprintf(txt,"LoadImage() failed (error code: %d) in file %s, line %d.",GetLastError(),__FILE__,__LINE__);
+			sprintf(txt,"LoadImage('%s') failed (error code: %d) in file %s, line %d.",iconname,GetLastError(),__FILE__,__LINE__);
 			MessageBox(NULL, txt, "TrayCD Error", MB_ICONERROR|MB_OK);
 			PostQuitMessage(1);
 		}
@@ -118,7 +101,24 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	
 	//Add tray icon
 	UpdateTray();
-
+	
+	//Check for CD drives
+	DWORD drives=GetLogicalDrives();
+	int bitmask=1;
+	char driveletters[]="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	int i;
+	for (i=0; i < strlen(driveletters); i++) {
+		open[i]=0;
+		if (drives&bitmask) {
+			char drive[]="X:\\";
+			drive[0]=driveletters[i];
+			if (GetDriveType(drive) == DRIVE_CDROM) {
+				sprintf(cdrom,"%s%c",cdrom,driveletters[i]);
+			}
+		}
+		bitmask=bitmask << 1;
+	}
+	
 	//Message loop
 	MSG msg;
 	while(GetMessage(&msg, NULL, 0, 0)) {
@@ -255,23 +255,23 @@ void ToggleCD(int p_n) {
 	CreateThread(NULL,0,_ToggleCD,n,0,NULL);
 }
 
-DWORD WINAPI _RotateIcon(LPVOID arg) {
+DWORD WINAPI _SpinIcon(LPVOID arg) {
 	double howlong=*(double*)arg;
-	time_t timenow=time(NULL), timethen;
-	for (timethen=time(NULL); difftime(timethen,timenow) < howlong; timethen=time(NULL)) {
-		iconpos = (iconpos+1)%4;
+	time_t timestart=time(NULL), timenow;
+	for (timenow=time(NULL); difftime(timenow,timestart) < howlong; timenow=time(NULL)) {
+		iconpos = (iconpos+1)%14;
 		UpdateTray();
 		//Sleep
 		//TODO: Implement some kind of sine function to make the spinning look cooler
-		Sleep(50);
+		Sleep(20-10*difftime(timenow,timestart)/howlong);
 	}
 	free(arg);
 }
 
-void RotateIcon(double p_howlong) {
+void SpinIcon(double p_howlong) {
 	double *howlong=malloc(sizeof(double));
 	*howlong=p_howlong;
-	CreateThread(NULL,0,_RotateIcon,howlong,0,NULL);
+	CreateThread(NULL,0,_SpinIcon,howlong,0,NULL);
 }
 
 void SetAutostart(int on) {
@@ -321,7 +321,7 @@ LRESULT CALLBACK MyWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		if (wmId >= SWM_TOGGLE && wmId <= SWM_TOGGLE+26) {
 			int n=wmId-SWM_TOGGLE-20; //This is really weird, but somehow wmId-SWM_TOGGLE needs to be subtracted with 20
 			ToggleCD(n);
-			RotateIcon(1.5);
+			SpinIcon(1.5);
 		}
 		else if (wmId == SWM_AUTOSTART_ON) {
 			SetAutostart(1);
@@ -330,16 +330,16 @@ LRESULT CALLBACK MyWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			SetAutostart(0);
 		}
 		else if (wmId == SWM_SPIN) {
-			RotateIcon(5);
+			SpinIcon(5);
 		}
 		else if (wmId == SWM_ABOUT) {
 			MessageBox(NULL, "TrayCD - 0.3\n\
 http://traycd.googlecode.com/\n\
-recover89@gmail.com\n\
 \n\
 Eject and insert the cd tray via a tray icon.\n\
+Icons by Onyx Reyes, onyxreyes@gmail.com.\n\
 \n\
-Send feedback to recover89@gmail.com", "About TrayCD", MB_ICONINFORMATION|MB_OK);
+Send feedback to recover89@gmail.com.", "About TrayCD", MB_ICONINFORMATION|MB_OK);
 		}
 		else if (wmId == SWM_EXIT) {
 			DestroyWindow(hwnd);
@@ -348,14 +348,14 @@ Send feedback to recover89@gmail.com", "About TrayCD", MB_ICONINFORMATION|MB_OK)
 	else if (msg == WM_ICONTRAY) {
 		if (lParam == WM_LBUTTONDOWN) {
 			ToggleCD(0);
-			RotateIcon(1.5);
+			SpinIcon(1.5);
 		}
 		else if (lParam == WM_RBUTTONDOWN) {
 			ShowContextMenu(hwnd);
 		}
 		else if (lParam == WM_MBUTTONDOWN) {
 			ToggleCD(1);
-			RotateIcon(1.5);
+			SpinIcon(1.5);
 		}
 	}
 	else if (msg == WM_TASKBARCREATED) {

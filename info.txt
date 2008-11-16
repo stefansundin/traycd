@@ -1,14 +1,17 @@
 TrayCD
 http://traycd.googlecode.com/
-recover89@gmail.com
 
 Eject and insert the cd tray via a tray icon.
+Icons by Onyx Reyes, onyxreyes@gmail.com.
+
+Send feedback to recover89@gmail.com.
 
 Changelog
 ---------
 0.3:
 Can now manage multiple cdrom drives.
 Use middle click on tray to open second drive.
+New icons by Onyx Reyes, licensed under CC-BY-SA.
 
 0.2:
 Added autostart option.
