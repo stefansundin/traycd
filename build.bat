@@ -17,7 +17,7 @@ if "%1" == "all" (
 		if not exist "build/%%f/TrayCD" (
 			mkdir "build\%%f\TrayCD"
 		)
-		copy "localization/%%f/info.txt" "build/%%f/TrayCD/info.txt"
+		copy "localization\%%f\info.txt" "build/%%f/TrayCD/info.txt"
 		
 		gcc -o "build/%%f/TrayCD/TrayCD.exe" traycd.c build/resources.o WINMM.LIB -mwindows -DL10N_FILE=\"localization/%%f/strings.h\"
 		if exist "build/%%f/TrayCD/TrayCD.exe" (
