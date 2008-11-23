@@ -1,0 +1,15 @@
+#summary Directly from info.txt
+
+Check [http://traycd.googlecode.com/svn/trunk/localization/en-US/info.txt info.txt] if there seems to be something missing. Note that info.txt can contain changes for upcoming versions.
+
+*0.3* - 2008-11-16:
+  * Can now manage multiple cdrom drives.
+  * Use middle click on tray to open second drive.
+  * New icons by Onyx Reyes, licensed under CC-BY-SA. http://traycd.googlecode.com/svn/trunk/media/png/icon16.png
+
+*0.2* - 2008-06-08:
+  * Added autostart option.
+  * Tray icon is now re-added when explorer crashes.
+
+*0.1* - 2008-06-08:
+  * Initial release.
