@@ -6,14 +6,6 @@
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #define UNICODE
@@ -25,13 +17,12 @@
 #include <windows.h>
 #include <mmsystem.h>
 
+//Localization
 #define L10N_NAME    L"TrayCD"
 #define L10N_VERSION L"0.3"
-//Localization
 #ifndef L10N_FILE
 #define L10N_FILE "localization/en-US/strings.h"
 #endif
-//Include strings and output error if they are out of date
 #include L10N_FILE
 #if L10N_FILE_VERSION != 1
 #error Localization not up to date!
@@ -46,19 +37,18 @@
 #define SWM_EXIT          WM_APP+5
 #define SWM_TOGGLE        WM_APP+10 //10-36 reserved for toggle
 
-//Stuff
-LRESULT CALLBACK MyWndProc(HWND, UINT, WPARAM, LPARAM);
-
+//Boring stuff
+LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 static HICON icon[15];
 static NOTIFYICONDATA traydata;
-static UINT WM_TASKBARCREATED;
+static UINT WM_TASKBARCREATED=0;
 static int tray_added=0;
+static wchar_t txt[100];
 
+//Cool stuff
 static wchar_t cdrom[27]=L"";
 static int open[26];
 static int iconpos=0;
-
-static wchar_t txt[100];
 
 //Error message handling
 static int showerror=1;
@@ -66,7 +56,7 @@ static int showerror=1;
 LRESULT CALLBACK ErrorMsgProc(INT nCode, WPARAM wParam, LPARAM lParam) {
 	if (nCode == HCBT_ACTIVATE) {
 		//Edit the caption of the buttons
-		SetDlgItemText((HWND)wParam,IDYES,L"Copy message");
+		SetDlgItemText((HWND)wParam,IDYES,L"Copy error");
 		SetDlgItemText((HWND)wParam,IDNO,L"OK");
 	}
 	return 0;
@@ -101,7 +91,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	WNDCLASSEX wnd;
 	wnd.cbSize=sizeof(WNDCLASSEX);
 	wnd.style=0;
-	wnd.lpfnWndProc=MyWndProc;
+	wnd.lpfnWndProc=WindowProc;
 	wnd.cbClsExtra=0;
 	wnd.cbWndExtra=0;
 	wnd.hInstance=hInst;
@@ -257,8 +247,8 @@ int RemoveTray() {
 void SetAutostart(int on) {
 	//Open key
 	HKEY key;
-	int error=RegOpenKeyEx(HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Run",0,KEY_SET_VALUE,&key);
-	if (error != ERROR_SUCCESS) {
+	int error;
+	if ((error=RegOpenKeyEx(HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Run",0,KEY_SET_VALUE,&key)) != ERROR_SUCCESS) {
 		Error(L"RegOpenKeyEx(HKEY_CURRENT_USER,'Software\\Microsoft\\Windows\\CurrentVersion\\Run')",L"Error opening the registry.",error,__LINE__);
 		return;
 	}
@@ -272,16 +262,14 @@ void SetAutostart(int on) {
 		//Add
 		wchar_t value[MAX_PATH+10];
 		swprintf(value,L"\"%s\"",path);
-		error=RegSetValueEx(key,L10N_NAME,0,REG_SZ,(LPBYTE)value,(wcslen(value)+1)*sizeof(wchar_t));
-		if (error != ERROR_SUCCESS) {
+		if ((error=RegSetValueEx(key,L10N_NAME,0,REG_SZ,(LPBYTE)value,(wcslen(value)+1)*sizeof(wchar_t))) != ERROR_SUCCESS) {
 			Error(L"RegSetValueEx('"L10N_NAME"')",L"",error,__LINE__);
 			return;
 		}
 	}
 	else {
 		//Remove
-		error=RegDeleteValue(key,L10N_NAME);
-		if (error != ERROR_SUCCESS) {
+		if ((error=RegDeleteValue(key,L10N_NAME)) != ERROR_SUCCESS) {
 			Error(L"RegDeleteValue('"L10N_NAME"')",L"",error,__LINE__);
 			return;
 		}
@@ -335,7 +323,7 @@ void SpinIcon(double p_howlong) {
 	CreateThread(NULL,0,_SpinIcon,howlong,0,NULL);
 }
 
-LRESULT CALLBACK MyWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	if (msg == WM_ICONTRAY) {
 		if (lParam == WM_LBUTTONDOWN) {
 			ToggleCD(0);
@@ -378,9 +366,7 @@ LRESULT CALLBACK MyWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (msg == WM_DESTROY) {
 		showerror=0;
-		if (tray_added) {
-			RemoveTray();
-		}
+		RemoveTray();
 		PostQuitMessage(0);
 		return 0;
 	}
