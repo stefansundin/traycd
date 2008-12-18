@@ -106,7 +106,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	RegisterClassEx(&wnd);
 	
 	//Create window
-	HWND hwnd=CreateWindowEx(0,wnd.lpszClassName, L10N_NAME, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInst, NULL);
+	HWND hwnd=CreateWindowEx(0, wnd.lpszClassName, L10N_NAME, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInst, NULL);
 	
 	//Register TaskbarCreated so we can re-add the tray icon if explorer.exe crashes
 	if ((WM_TASKBARCREATED=RegisterWindowMessage(L"TaskbarCreated")) == 0) {
@@ -281,14 +281,21 @@ void SetAutostart(int on) {
 DWORD WINAPI _ToggleCD(LPVOID arg) {
 	int n=*(int*)arg;
 	if (n <= wcslen(cdrom)) {
-		MCI_OPEN_PARMS mci;
-		ZeroMemory(&mci, sizeof(MCI_OPEN_PARMS));
-		mci.lpstrDeviceType = (LPCWSTR)MCI_DEVTYPE_CD_AUDIO;
-		
-		wchar_t drive[]=L"X";
+		//Try to figure out if the CD tray is ejected
+		wchar_t drive[]=L"X:";
 		drive[0]=cdrom[n];
-		mci.lpstrElementName = drive;
+		wchar_t name[MAX_PATH+1];
+		if (GetVolumeInformation(drive,name,MAX_PATH+1,NULL,NULL,NULL,NULL,0) == 1) {
+			//The tray is closed and has a CD in it
+			open[n]=0;
+		}
 		
+		//Toggle drive
+		MCI_OPEN_PARMS mci;
+		ZeroMemory(&mci,sizeof(MCI_OPEN_PARMS));
+		mci.lpstrDeviceType=(LPCWSTR)MCI_DEVTYPE_CD_AUDIO;
+		swprintf(drive,L"%c",cdrom[n]);
+		mci.lpstrElementName=drive;
 		if (!mciSendCommand(0, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_TYPE_ID | MCI_NOTIFY | MCI_OPEN_ELEMENT, (DWORD) &mci)) {
 			open[n]=!open[n];
 			mciSendCommand(mci.wDeviceID, MCI_SET, (open[n]?MCI_SET_DOOR_OPEN:MCI_SET_DOOR_CLOSED), 0);
@@ -299,7 +306,7 @@ DWORD WINAPI _ToggleCD(LPVOID arg) {
 }
 
 void ToggleCD(int p_n) {
-	int *n=malloc(sizeof(int));
+	int *n=malloc(sizeof(p_n));
 	*n=p_n;
 	CreateThread(NULL,0,_ToggleCD,n,0,NULL);
 }
@@ -318,7 +325,7 @@ DWORD WINAPI _SpinIcon(LPVOID arg) {
 }
 
 void SpinIcon(double p_howlong) {
-	double *howlong=malloc(sizeof(double));
+	double *howlong=malloc(sizeof(p_howlong));
 	*howlong=p_howlong;
 	CreateThread(NULL,0,_SpinIcon,howlong,0,NULL);
 }
