@@ -17,16 +17,21 @@ if "%1" == "all" (
 		if not exist "build/%%f/TrayCD" (
 			mkdir "build\%%f\TrayCD"
 		)
-		copy "localization\%%f\info.txt" "build/%%f/TrayCD/info.txt"
+		copy "localization\%%f\info.txt" "build/%%f/TrayCD"
+		copy "TrayCD.ini" "build/%%f/TrayCD"
 		
-		gcc -o "build/%%f/TrayCD/TrayCD.exe" traycd.c build/resources.o WINMM.LIB -mwindows -DL10N_FILE=\"localization/%%f/strings.h\"
+		gcc -o "build/%%f/TrayCD/TrayCD.exe" traycd.c build/resources.o WINMM.LIB -mwindows -lshlwapi -lwininet -DL10N_FILE=\"localization/%%f/strings.h\"
 		if exist "build/%%f/TrayCD/TrayCD.exe" (
 			strip "build/%%f/TrayCD/TrayCD.exe"
 			upx --best -qq "build/%%f/TrayCD/TrayCD.exe"
 		)
 	)
+	
+	@echo.
+	echo Building installer
+	makensis /V2 installer.nsi
 ) else (
-	gcc -o TrayCD.exe traycd.c build/resources.o WINMM.LIB -mwindows
+	gcc -o TrayCD.exe traycd.c build/resources.o WINMM.LIB -mwindows -lshlwapi -lwininet
 	
 	if "%1" == "run" (
 		start TrayCD.exe

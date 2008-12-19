@@ -14,35 +14,55 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#define _WIN32_IE 0x0600
 #include <windows.h>
+#include <shlwapi.h>
+#include <wininet.h>
 #include <mmsystem.h>
 
+//App
+#define APP_NAME      L"TrayCD"
+#define APP_VERSION   "0.4"
+#define APP_URL       L"http://traycd.googlecode.com/"
+#define APP_UPDATEURL L"http://traycd.googlecode.com/svn/wiki/latest-stable.txt"
+//#define DEBUG
+
 //Localization
-#define L10N_NAME    L"TrayCD"
-#define L10N_VERSION L"0.3"
 #ifndef L10N_FILE
 #define L10N_FILE "localization/en-US/strings.h"
 #endif
 #include L10N_FILE
-#if L10N_FILE_VERSION != 1
+#if L10N_VERSION != 1
 #error Localization not up to date!
 #endif
 
 //Messages
-#define WM_ICONTRAY       WM_USER+1
-#define SWM_AUTOSTART_ON  WM_APP+1
-#define SWM_AUTOSTART_OFF WM_APP+2
-#define SWM_SPIN          WM_APP+3
-#define SWM_ABOUT         WM_APP+4
-#define SWM_EXIT          WM_APP+5
-#define SWM_TOGGLE        WM_APP+10 //10-36 reserved for toggle
+#define WM_ICONTRAY            WM_USER+1
+#define SWM_AUTOSTART_ON       WM_APP+1
+#define SWM_AUTOSTART_OFF      WM_APP+2
+#define SWM_SPIN               WM_APP+3
+#define SWM_UPDATE             WM_APP+4
+#define SWM_ABOUT              WM_APP+5
+#define SWM_EXIT               WM_APP+6
+#define SWM_TOGGLE             WM_APP+10 //10-36 reserved for toggle
+
+//Balloon stuff missing in MinGW
+#define NIIF_USER 4
+#define NIN_BALLOONSHOW        WM_USER+2
+#define NIN_BALLOONHIDE        WM_USER+3
+#define NIN_BALLOONTIMEOUT     WM_USER+4
+#define NIN_BALLOONUSERCLICK   WM_USER+5
 
 //Boring stuff
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 static HICON icon[15];
 static NOTIFYICONDATA traydata;
-static UINT WM_TASKBARCREATED=0;
+static unsigned int WM_TASKBARCREATED=0;
 static int tray_added=0;
+static int update=0;
+struct {
+	int CheckForUpdate;
+} settings={0};
 static wchar_t txt[100];
 
 //Cool stuff
@@ -71,7 +91,7 @@ void Error(wchar_t *func, wchar_t *info, int errorcode, int line) {
 		swprintf(txt,L"%s failed in file %s, line %d.\nError: %s (%d)\n\n%s", func, TEXT(__FILE__), line, errormsg, errorcode, info);
 		//Display message
 		HHOOK hhk=SetWindowsHookEx(WH_CBT, &ErrorMsgProc, 0, GetCurrentThreadId());
-		int response=MessageBox(NULL, txt, L10N_NAME" Error", MB_ICONERROR|MB_YESNO|MB_DEFBUTTON2);
+		int response=MessageBox(NULL, txt, APP_NAME" Error", MB_ICONERROR|MB_YESNO|MB_DEFBUTTON2);
 		UnhookWindowsHookEx(hhk);
 		if (response == IDYES) {
 			//Copy message to clipboard
@@ -83,6 +103,62 @@ void Error(wchar_t *func, wchar_t *info, int errorcode, int line) {
 			CloseClipboard();
 		}
 	}
+}
+
+//Check for update
+DWORD WINAPI _CheckForUpdate() {
+	//Open connection
+	HINTERNET http, file;
+	if ((http=InternetOpen(APP_NAME" - "APP_VERSION,INTERNET_OPEN_TYPE_DIRECT,NULL,NULL,0)) == NULL) {
+		#ifdef DEBUG
+		Error(L"InternetOpen()",L"Could not establish connection.\nPlease check for update manually at "APP_URL,GetLastError(),__LINE__);
+		#endif
+		return;
+	}
+	if ((file=InternetOpenUrl(http,APP_UPDATEURL,NULL,0,INTERNET_FLAG_NO_AUTH|INTERNET_FLAG_NO_AUTO_REDIRECT|INTERNET_FLAG_NO_CACHE_WRITE|INTERNET_FLAG_NO_COOKIES|INTERNET_FLAG_NO_UI,0)) == NULL) {
+		#ifdef DEBUG
+		Error(L"InternetOpenUrl()",L"Could not establish connection.\nPlease check for update manually at "APP_URL,GetLastError(),__LINE__);
+		#endif
+		return;
+	}
+	//Read file
+	char data[20];
+	DWORD numread;
+	if (InternetReadFile(file,data,sizeof(data),&numread) == FALSE) {
+		#ifdef DEBUG
+		Error(L"InternetReadFile()",L"Could not read file.\nPlease check for update manually at "APP_URL,GetLastError(),__LINE__);
+		#endif
+		return;
+	}
+	data[numread]='\0';
+	//Get error code
+	wchar_t code[4];
+	DWORD len=sizeof(code);
+	HttpQueryInfo(file,HTTP_QUERY_STATUS_CODE,&code,&len,NULL);
+	//Close connection
+	InternetCloseHandle(file);
+	InternetCloseHandle(http);
+	
+	//Make sure the server returned 200
+	if (wcscmp(code,L"200")) {
+		#ifdef DEBUG
+		swprintf(txt,L"Server returned %s error when checking for update.\nPlease check for update manually at "APP_URL,code);
+		MessageBox(NULL, txt, APP_NAME, MB_ICONWARNING|MB_OK);
+		#endif
+		return;
+	}
+	
+	//New version available?
+	if (strcmp(data,APP_VERSION)) {
+		update=1;
+		traydata.uFlags|=NIF_INFO;
+		UpdateTray();
+		traydata.uFlags^=NIF_INFO;
+	}
+}
+
+void CheckForUpdate() {
+	CreateThread(NULL,0,_CheckForUpdate,NULL,0,NULL);
 }
 
 //Entry point
@@ -100,18 +176,13 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	wnd.hCursor=LoadImage(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTCOLOR|LR_SHARED);
 	wnd.hbrBackground=(HBRUSH)(COLOR_WINDOW+1);
 	wnd.lpszMenuName=NULL;
-	wnd.lpszClassName=L10N_NAME;
+	wnd.lpszClassName=APP_NAME;
 	
 	//Register class
 	RegisterClassEx(&wnd);
 	
 	//Create window
-	HWND hwnd=CreateWindowEx(0, wnd.lpszClassName, L10N_NAME, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInst, NULL);
-	
-	//Register TaskbarCreated so we can re-add the tray icon if explorer.exe crashes
-	if ((WM_TASKBARCREATED=RegisterWindowMessage(L"TaskbarCreated")) == 0) {
-		Error(L"RegisterWindowMessage('TaskbarCreated')",L"This means the tray icon won't be added if (or should I say when) explorer.exe crashes.",GetLastError(),__LINE__);
-	}
+	HWND hwnd=CreateWindowEx(0, wnd.lpszClassName, APP_NAME, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInst, NULL);
 	
 	//Load icons
 	wchar_t iconname[]=L"trayXX";
@@ -122,7 +193,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 			PostQuitMessage(1);
 		}
 	}
-	
 	//Seed iconpos
 	srand(time(NULL));
 	iconpos=rand()%14;
@@ -133,7 +203,15 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	traydata.uFlags=NIF_MESSAGE|NIF_ICON|NIF_TIP;
 	traydata.hWnd=hwnd;
 	traydata.uCallbackMessage=WM_ICONTRAY;
-	wcsncpy(traydata.szTip,L10N_NAME,sizeof(traydata.szTip));
+	wcsncpy(traydata.szTip,APP_NAME,sizeof(traydata.szTip)/sizeof(wchar_t));
+	//Balloon tooltip
+	traydata.uTimeout=10000;
+	wcsncpy(traydata.szInfoTitle,APP_NAME,sizeof(traydata.szInfoTitle)/sizeof(wchar_t));
+	wcsncpy(traydata.szInfo,L10N_UPDATE_BALLOON,sizeof(traydata.szInfo)/sizeof(wchar_t));
+	traydata.dwInfoFlags=NIIF_USER;
+	
+	//Register TaskbarCreated so we can re-add the tray icon if explorer.exe crashes
+	WM_TASKBARCREATED=RegisterWindowMessage(L"TaskbarCreated");
 	
 	//Update tray icon
 	UpdateTray();
@@ -153,6 +231,18 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 			}
 		}
 		bitmask=bitmask << 1;
+	}
+	
+	//Load settings
+	wchar_t path[MAX_PATH];
+	GetModuleFileName(NULL, path, sizeof(path));
+	PathRenameExtension(path,L".ini");
+	GetPrivateProfileString(L"Update",L"CheckForUpdate",L"0",txt,sizeof(txt)/sizeof(wchar_t),path);
+	swscanf(txt,L"%d",&settings.CheckForUpdate);
+	
+	//Check for update
+	if (settings.CheckForUpdate) {
+		CheckForUpdate();
 	}
 	
 	//Message loop
@@ -184,7 +274,7 @@ void ShowContextMenu(HWND hwnd) {
 	//Read value
 	wchar_t autostart_value[MAX_PATH+10];
 	DWORD len=sizeof(autostart_value);
-	RegQueryValueEx(key,L10N_NAME,NULL,NULL,(LPBYTE)autostart_value,&len);
+	RegQueryValueEx(key,APP_NAME,NULL,NULL,(LPBYTE)autostart_value,&len);
 	//Close key
 	RegCloseKey(key);
 	//Get path
@@ -202,6 +292,13 @@ void ShowContextMenu(HWND hwnd) {
 	
 	//Spin icon (just for fun)
 	InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_SPIN, L10N_MENU_SPIN);
+	InsertMenu(hMenu, -1, MF_BYPOSITION|MF_SEPARATOR, 0, NULL);
+	
+	//Update
+	if (update) {
+		InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_UPDATE, L10N_MENU_UPDATE);
+		InsertMenu(hMenu, -1, MF_BYPOSITION|MF_SEPARATOR, 0, NULL);
+	}
 	
 	//About
 	InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_ABOUT, L10N_MENU_ABOUT);
@@ -262,15 +359,15 @@ void SetAutostart(int on) {
 		//Add
 		wchar_t value[MAX_PATH+10];
 		swprintf(value,L"\"%s\"",path);
-		if ((error=RegSetValueEx(key,L10N_NAME,0,REG_SZ,(LPBYTE)value,(wcslen(value)+1)*sizeof(wchar_t))) != ERROR_SUCCESS) {
-			Error(L"RegSetValueEx('"L10N_NAME"')",L"",error,__LINE__);
+		if ((error=RegSetValueEx(key,APP_NAME,0,REG_SZ,(LPBYTE)value,(wcslen(value)+1)*sizeof(wchar_t))) != ERROR_SUCCESS) {
+			Error(L"RegSetValueEx('"APP_NAME"')",L"",error,__LINE__);
 			return;
 		}
 	}
 	else {
 		//Remove
-		if ((error=RegDeleteValue(key,L10N_NAME)) != ERROR_SUCCESS) {
-			Error(L"RegDeleteValue('"L10N_NAME"')",L"",error,__LINE__);
+		if ((error=RegDeleteValue(key,APP_NAME)) != ERROR_SUCCESS) {
+			Error(L"RegDeleteValue('"APP_NAME"')",L"",error,__LINE__);
 			return;
 		}
 	}
@@ -343,6 +440,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			ToggleCD(1);
 			SpinIcon(1.5);
 		}
+		else if (lParam == NIN_BALLOONUSERCLICK) {
+			SendMessage(hwnd,WM_COMMAND,SWM_UPDATE,0);
+		}
 	}
 	else if (msg == WM_TASKBARCREATED) {
 		tray_added=0;
@@ -363,6 +463,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		}
 		else if (wmId == SWM_SPIN) {
 			SpinIcon(5);
+		}
+		else if (wmId == SWM_UPDATE) {
+			if (MessageBox(NULL, L10N_UPDATE_DIALOG, APP_NAME, MB_ICONINFORMATION|MB_YESNO) == IDYES) {
+				ShellExecute(NULL, L"open", APP_URL, NULL, NULL, SW_SHOWNORMAL);
+			}
 		}
 		else if (wmId == SWM_ABOUT) {
 			MessageBox(NULL, L10N_ABOUT, L10N_ABOUT_TITLE, MB_ICONINFORMATION|MB_OK);
