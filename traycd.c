@@ -57,13 +57,13 @@
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 static HICON icon[15];
 static NOTIFYICONDATA traydata;
-static unsigned int WM_TASKBARCREATED=0;
+static UINT WM_TASKBARCREATED=0;
 static int tray_added=0;
 static int update=0;
 struct {
 	int CheckForUpdate;
 } settings={0};
-static wchar_t txt[100];
+static wchar_t txt[1000];
 
 //Cool stuff
 static wchar_t cdrom[27]=L"";
@@ -235,7 +235,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	
 	//Load settings
 	wchar_t path[MAX_PATH];
-	GetModuleFileName(NULL, path, sizeof(path));
+	GetModuleFileName(NULL,path,sizeof(path)/sizeof(wchar_t));
 	PathRenameExtension(path,L".ini");
 	GetPrivateProfileString(L"Update",L"CheckForUpdate",L"0",txt,sizeof(txt)/sizeof(wchar_t),path);
 	swscanf(txt,L"%d",&settings.CheckForUpdate);

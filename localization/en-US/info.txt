@@ -8,8 +8,15 @@ Middle-click the tray icon to toggle the second cd-rom drive.
 Check for updates at http://traycd.googlecode.com/
 Send feedback to recover89@gmail.com
 
+If you feel this program is useful, please consider donating money.
+You can find out how to donate on the website.
+
 Changelog
 ---------
+trunk:
+TrayCD now tries to detect whether the CD drive is open or closed.
+Added update checking.
+
 0.3 - 2008-11-16:
 Can now manage multiple cd-rom drives.
 Middle-click on the tray icon toggles the second cd-rom drive.
