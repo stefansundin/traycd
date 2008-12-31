@@ -1,0 +1,31 @@
+TrayCD
+Por Stefan Sundin
+Icons by Onyx Reyes (onyxreyes@gmail.com)
+Traducido por Fabrizio Ferri (algernon@gmail.com)
+
+Expulsa e inserta tus unidades cd-rom desde un icono de notificación.
+El clic central en el icono actuará sobre la segunda unidad óptica.
+
+Visita la página web en http://altdrag.googlecode.com/
+Envía comentarios a recover89@gmail.com
+
+Si opinas que este programa es útil, por favor, toma en consideración realizar un donativo. 
+Encontrarás las instrucciones en la página web.
+
+Historial de cambios
+--------------------
+Truncado:
+TrayCD intenta ahora detectar si la bandeja del CD está abierta o cerrada.
+Añadida comprobación de actualizaciones.
+
+0.3 - 2008-11-16:
+Compatible con múltiples unidades ópticas.
+El clic central en el icono actuará sobre la segunda unidad óptica.
+Nuevos iconos hechos por Onyx Reyes, bajo licencia CC-BY-SA.
+
+0.2 - 2008-06-08:
+Opción para iniciar TrayCD con Windows.
+El icono de notificación vuelve ahora a añadirse cuando se reinicia Explorer.
+
+0.1 - 2008-06-08:
+Primera versión.
