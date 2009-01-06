@@ -25,7 +25,6 @@
 #define APP_VERSION   "0.4"
 #define APP_URL       L"http://traycd.googlecode.com/"
 #define APP_UPDATEURL L"http://traycd.googlecode.com/svn/wiki/latest-stable.txt"
-//#define DEBUG
 
 //Localization
 #ifndef L10N_FILE

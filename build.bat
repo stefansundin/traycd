@@ -31,7 +31,7 @@ if "%1" == "all" (
 	echo Building installer
 	makensis /V2 installer.nsi
 ) else (
-	gcc -o TrayCD.exe traycd.c build/resources.o WINMM.LIB -mwindows -lshlwapi -lwininet
+	gcc -o TrayCD.exe traycd.c build/resources.o WINMM.LIB -mwindows -lshlwapi -lwininet -DDEBUG
 	
 	if "%1" == "run" (
 		start TrayCD.exe
