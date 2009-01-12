@@ -10,7 +10,7 @@
 
 
 !define APP_NAME      "TrayCD"
-!define APP_VERSION   "0.4"
+!define APP_VERSION   "1.0"
 !define APP_URL       "http://traycd.googlecode.com/"
 !define APP_UPDATEURL "http://traycd.googlecode.com/svn/wiki/latest-stable.txt"
 !define L10N_VERSION  1

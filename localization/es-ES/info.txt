@@ -14,7 +14,7 @@ Encontrarás las instrucciones en la página web.
 
 Historial de cambios
 --------------------
-Truncado:
+1.0 - 2009-01-12:
 TrayCD intenta ahora detectar si la bandeja del CD está abierta o cerrada.
 Añadida comprobación de actualizaciones.
 
