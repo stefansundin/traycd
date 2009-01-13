@@ -2,6 +2,10 @@
 
 Check [http://traycd.googlecode.com/svn/trunk/localization/en-US/info.txt info.txt] if there seems to be something missing. Note that info.txt can contain changes for upcoming versions.
 
+*1.0* - 2009-01-12:
+  * TrayCD now tries to detect whether the CD drive is open or closed.
+  * Added update checking.
+
 *0.3* - 2008-11-16:
   * Can now manage multiple cdrom drives.
   * Use middle click on tray to open second drive.
