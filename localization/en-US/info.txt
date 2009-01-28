@@ -13,6 +13,9 @@ You can find out how to donate on the website.
 
 Changelog
 ---------
+1.1:
+Language can now be changed in TrayCD.ini.
+
 1.0 - 2009-01-12:
 TrayCD now tries to detect whether the CD drive is open or closed.
 Added update checking.

@@ -1,7 +1,7 @@
 ;TrayCD installer
 ;NSIS Unicode: http://www.scratchpaper.com/
 ;
-;Copyright (C) 2008  Stefan Sundin (recover89@gmail.com)
+;Copyright (C) 2009  Stefan Sundin (recover89@gmail.com)
 ;
 ;This program is free software: you can redistribute it and/or modify
 ;it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 
 !include "MUI2.nsh"
 
-Name "${APP_NAME}"
-OutFile "build/${APP_NAME}-${APP_VERSION} (Installer).exe"
+Name "${APP_NAME} ${APP_VERSION}"
+OutFile "build/${APP_NAME}-${APP_VERSION}.exe"
 InstallDir "$PROGRAMFILES\${APP_NAME}"
 InstallDirRegKey HKCU "Software\${APP_NAME}" "Install_Dir"
 RequestExecutionLevel user
@@ -63,7 +63,7 @@ SetCompressor lzma
 Section "$(L10N_UPDATE_SECTION)"
 	NSISdl::download "${APP_UPDATEURL}" "$TEMP\${APP_NAME}-updatecheck"
 	Pop $R0
-		StrCmp $R0 "success" +3
+	StrCmp $R0 "success" +3
 		DetailPrint "Update check failed. Error: $R0"
 		Goto done
 	FileOpen $0 "$TEMP\${APP_NAME}-updatecheck" r
@@ -80,7 +80,7 @@ SectionEnd
 
 Section "${APP_NAME} (${APP_VERSION})"
 	SectionIn RO
-
+	
 	FindWindow $0 "${APP_NAME}" ""
 	IntCmp $0 0 continue
 		MessageBox MB_ICONINFORMATION|MB_YESNO "$(L10N_RUNNING_INSTALL)" IDNO continue
@@ -88,24 +88,29 @@ Section "${APP_NAME} (${APP_VERSION})"
 			SendMessage $0 ${WM_CLOSE} 0 0
 			Sleep 1000
 	continue:
-
+	
 	SetOutPath "$INSTDIR"
-
+	
 	;Store directory and version
 	WriteRegStr HKCU "Software\${APP_NAME}" "Install_Dir" "$INSTDIR"
 	WriteRegStr HKCU "Software\${APP_NAME}" "Version" "${APP_VERSION}"
-
+	
+	;Install files
+	File "build\en-US\${APP_NAME}\${APP_NAME}.exe"
+	File "build\en-US\${APP_NAME}\${APP_NAME}.ini"
+	
 	IntCmp $LANGUAGE ${LANG_ENGLISH} en-US
 	IntCmp $LANGUAGE ${LANG_SPANISH} es-ES
 	en-US:
-		File "build\en-US\${APP_NAME}\*"
+		File "build\en-US\${APP_NAME}\info.txt"
 		Goto files_installed
 	es-ES:
-		File "build\es-ES\${APP_NAME}\*"
+		File "build\es-ES\${APP_NAME}\info.txt"
+		WriteINIStr "$INSTDIR\${APP_NAME}.ini" "${APP_NAME}" "Language" "es-ES"
 		Goto files_installed
-
+	
 	files_installed:
-
+	
 	;Create uninstaller
 	WriteUninstaller "Uninstall.exe"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayName" "${APP_NAME}"

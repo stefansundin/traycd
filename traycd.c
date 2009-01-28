@@ -1,6 +1,6 @@
 /*
 	TrayCD - Eject and insert the cd tray via a tray icon
-	Copyright (C) 2008  Stefan Sundin (recover89@gmail.com)
+	Copyright (C) 2009  Stefan Sundin (recover89@gmail.com)
 	
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -26,15 +26,6 @@
 #define APP_URL       L"http://traycd.googlecode.com/"
 #define APP_UPDATEURL L"http://traycd.googlecode.com/svn/wiki/latest-stable.txt"
 
-//Localization
-#ifndef L10N_FILE
-#define L10N_FILE "localization/en-US/strings.h"
-#endif
-#include L10N_FILE
-#if L10N_VERSION != 1
-#error Localization not up to date!
-#endif
-
 //Messages
 #define WM_ICONTRAY            WM_USER+1
 #define SWM_AUTOSTART_ON       WM_APP+1
@@ -52,25 +43,42 @@
 #define NIN_BALLOONTIMEOUT     WM_USER+4
 #define NIN_BALLOONUSERCLICK   WM_USER+5
 
+//Localization
+struct strings {
+	wchar_t *menu_open;
+	wchar_t *menu_close;
+	wchar_t *menu_autostart;
+	wchar_t *menu_spin;
+	wchar_t *menu_update;
+	wchar_t *menu_about;
+	wchar_t *menu_exit;
+	wchar_t *update_balloon;
+	wchar_t *update_dialog;
+	wchar_t *about_title;
+	wchar_t *about;
+};
+#include "localization/strings.h"
+struct strings *l10n=&en_US;
+
 //Boring stuff
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
-static HICON icon[15];
-static NOTIFYICONDATA traydata;
-static UINT WM_TASKBARCREATED=0;
-static int tray_added=0;
-static int update=0;
+HICON icon[15];
+NOTIFYICONDATA traydata;
+UINT WM_TASKBARCREATED=0;
+int tray_added=0;
+int update=0;
 struct {
 	int CheckForUpdate;
 } settings={0};
-static wchar_t txt[1000];
+wchar_t txt[1000];
 
 //Cool stuff
-static wchar_t cdrom[27]=L"";
-static int open[26];
-static int iconpos=0;
+wchar_t cdrom[27]=L"";
+int open[26];
+int iconpos=0;
 
 //Error message handling
-static int showerror=1;
+int showerror=1;
 
 LRESULT CALLBACK ErrorMsgProc(INT nCode, WPARAM wParam, LPARAM lParam) {
 	if (nCode == HCBT_ACTIVATE) {
@@ -150,6 +158,7 @@ DWORD WINAPI _CheckForUpdate() {
 	//New version available?
 	if (strcmp(data,APP_VERSION)) {
 		update=1;
+		wcsncpy(traydata.szInfo,l10n->update_balloon,sizeof(traydata.szInfo)/sizeof(wchar_t));
 		traydata.uFlags|=NIF_INFO;
 		UpdateTray();
 		traydata.uFlags^=NIF_INFO;
@@ -162,6 +171,20 @@ void CheckForUpdate() {
 
 //Entry point
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, int iCmdShow) {
+	//Load settings
+	wchar_t path[MAX_PATH];
+	GetModuleFileName(NULL,path,sizeof(path)/sizeof(wchar_t));
+	PathRenameExtension(path,L".ini");
+	GetPrivateProfileString(L"Update",L"CheckForUpdate",L"0",txt,sizeof(txt)/sizeof(wchar_t),path);
+	swscanf(txt,L"%d",&settings.CheckForUpdate);
+	GetPrivateProfileString(APP_NAME,L"Language",L"en-US",txt,sizeof(txt)/sizeof(wchar_t),path);
+	int i;
+	for (i=0; i < num_languages; i++) {
+		if (!wcscmp(txt,languages[i].code)) {
+			l10n=languages[i].strings;
+		}
+	}
+	
 	//Create window class
 	WNDCLASSEX wnd;
 	wnd.cbSize=sizeof(WNDCLASSEX);
@@ -206,7 +229,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	//Balloon tooltip
 	traydata.uTimeout=10000;
 	wcsncpy(traydata.szInfoTitle,APP_NAME,sizeof(traydata.szInfoTitle)/sizeof(wchar_t));
-	wcsncpy(traydata.szInfo,L10N_UPDATE_BALLOON,sizeof(traydata.szInfo)/sizeof(wchar_t));
 	traydata.dwInfoFlags=NIIF_USER;
 	
 	//Register TaskbarCreated so we can re-add the tray icon if explorer.exe crashes
@@ -219,7 +241,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	DWORD drives=GetLogicalDrives();
 	int bitmask=1;
 	wchar_t driveletters[]=L"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	int i;
 	for (i=0; i < wcslen(driveletters); i++) {
 		open[i]=0;
 		if (drives&bitmask) {
@@ -231,13 +252,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 		}
 		bitmask=bitmask << 1;
 	}
-	
-	//Load settings
-	wchar_t path[MAX_PATH];
-	GetModuleFileName(NULL,path,sizeof(path)/sizeof(wchar_t));
-	PathRenameExtension(path,L".ini");
-	GetPrivateProfileString(L"Update",L"CheckForUpdate",L"0",txt,sizeof(txt)/sizeof(wchar_t),path);
-	swscanf(txt,L"%d",&settings.CheckForUpdate);
 	
 	//Check for update
 	if (settings.CheckForUpdate) {
@@ -261,7 +275,7 @@ void ShowContextMenu(HWND hwnd) {
 	//Open/Close
 	int i;
 	for (i=0; i < wcslen(cdrom); i++) {
-		swprintf(txt,L"%s %c:",(open[i]?L10N_MENU_CLOSE:L10N_MENU_OPEN),cdrom[i]);
+		swprintf(txt,L"%s %c:",(open[i]?l10n->menu_close:l10n->menu_open),cdrom[i]);
 		InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_TOGGLE+i, txt);
 	}
 	
@@ -286,24 +300,24 @@ void ShowContextMenu(HWND hwnd) {
 		autostart=1;
 	}
 	//Autostart
-	InsertMenu(hMenu, -1, MF_BYPOSITION|(autostart?MF_CHECKED:0), (autostart?SWM_AUTOSTART_OFF:SWM_AUTOSTART_ON), L10N_MENU_AUTOSTART);
+	InsertMenu(hMenu, -1, MF_BYPOSITION|(autostart?MF_CHECKED:0), (autostart?SWM_AUTOSTART_OFF:SWM_AUTOSTART_ON), l10n->menu_autostart);
 	InsertMenu(hMenu, -1, MF_BYPOSITION|MF_SEPARATOR, 0, NULL);
 	
 	//Spin icon (just for fun)
-	InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_SPIN, L10N_MENU_SPIN);
+	InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_SPIN, l10n->menu_spin);
 	InsertMenu(hMenu, -1, MF_BYPOSITION|MF_SEPARATOR, 0, NULL);
 	
 	//Update
 	if (update) {
-		InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_UPDATE, L10N_MENU_UPDATE);
+		InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_UPDATE, l10n->menu_update);
 		InsertMenu(hMenu, -1, MF_BYPOSITION|MF_SEPARATOR, 0, NULL);
 	}
 	
 	//About
-	InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_ABOUT, L10N_MENU_ABOUT);
+	InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_ABOUT, l10n->menu_about);
 	
 	//Exit
-	InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_EXIT, L10N_MENU_EXIT);
+	InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_EXIT, l10n->menu_exit);
 
 	//Track menu
 	SetForegroundWindow(hwnd);
@@ -468,12 +482,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			SpinIcon(5);
 		}
 		else if (wmId == SWM_UPDATE) {
-			if (MessageBox(NULL, L10N_UPDATE_DIALOG, APP_NAME, MB_ICONINFORMATION|MB_YESNO) == IDYES) {
+			if (MessageBox(NULL, l10n->update_dialog, APP_NAME, MB_ICONINFORMATION|MB_YESNO) == IDYES) {
 				ShellExecute(NULL, L"open", APP_URL, NULL, NULL, SW_SHOWNORMAL);
 			}
 		}
 		else if (wmId == SWM_ABOUT) {
-			MessageBox(NULL, L10N_ABOUT, L10N_ABOUT_TITLE, MB_ICONINFORMATION|MB_OK);
+			MessageBox(NULL, l10n->about, l10n->about_title, MB_ICONINFORMATION|MB_OK);
 		}
 		else if (wmId == SWM_EXIT) {
 			DestroyWindow(hwnd);
