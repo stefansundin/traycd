@@ -15,18 +15,22 @@
 !define APP_UPDATEURL "http://traycd.googlecode.com/svn/wiki/latest-stable.txt"
 !define L10N_VERSION  1
 
-;General
+;Libraries
 
 !include "MUI2.nsh"
+!include "Sections.nsh"
+!include "LogicLib.nsh"
+
+;General
 
 Name "${APP_NAME} ${APP_VERSION}"
 OutFile "build/${APP_NAME}-${APP_VERSION}.exe"
 InstallDir "$PROGRAMFILES\${APP_NAME}"
 InstallDirRegKey HKCU "Software\${APP_NAME}" "Install_Dir"
-RequestExecutionLevel user
+;RequestExecutionLevel user
 ShowInstDetails hide
 ShowUninstDetails show
-SetCompressor lzma
+SetCompressor /SOLID lzma
 
 ;Interface
 
@@ -123,8 +127,7 @@ Section "$(L10N_SHORTCUT)"
 	CreateShortCut "$SMPROGRAMS\${APP_NAME}.lnk" "$INSTDIR\${APP_NAME}.exe" "" "$INSTDIR\${APP_NAME}.exe" 0
 SectionEnd
 
-Section /o "$(L10N_AUTOSTART)"
-	WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "${APP_NAME}" '"$INSTDIR\${APP_NAME}.exe"'
+Section /o "$(L10N_AUTOSTART)" sec_autostart
 SectionEnd
 
 Function Launch
@@ -133,6 +136,20 @@ FunctionEnd
 
 Function .onInit
 	!insertmacro MUI_LANGDLL_DISPLAY
+	;Determine current autostart setting
+	ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "${APP_NAME}"
+	IfErrors done
+		!insertmacro SelectSection ${sec_autostart}
+	done:
+FunctionEnd
+
+Function .onInstSuccess
+	;Set or remove autostart
+	${If} ${SectionIsSelected} ${sec_autostart}
+		WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "${APP_NAME}" '"$INSTDIR\${APP_NAME}.exe"'
+	${Else}
+		DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "${APP_NAME}"
+	${EndIf}
 FunctionEnd
 
 ;Uninstaller

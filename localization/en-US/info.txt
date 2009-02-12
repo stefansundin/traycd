@@ -5,7 +5,7 @@ Icons by Onyx Reyes (onyxreyes@gmail.com)
 Eject and insert your cd-rom drives via a tray icon.
 Middle-click the tray icon to toggle the second cd-rom drive.
 
-Check for updates at http://traycd.googlecode.com/
+Visit the website at http://traycd.googlecode.com/
 Send feedback to recover89@gmail.com
 
 If you feel this program is useful, please consider donating money.

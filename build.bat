@@ -9,6 +9,8 @@ if not exist build (
 windres -o build/resources.o resources.rc
 
 if "%1" == "all" (
+	gcc -o build\ini.exe ini.c -lshlwapi
+	
 	@echo.
 	echo Building binaries
 	if not exist "build/en-US/TrayCD" (
@@ -16,8 +18,9 @@ if "%1" == "all" (
 	)
 	gcc -o "build/en-US/TrayCD/TrayCD.exe" traycd.c build/resources.o WINMM.LIB -mwindows -lshlwapi -lwininet
 	if exist "build/en-US/TrayCD/TrayCD.exe" (
-		strip "build/en-US/TrayCD/TrayCD.exe"
+		exit /b
 	)
+	strip "build/en-US/TrayCD/TrayCD.exe"
 	
 	for /D %%f in (localization/*) do (
 		@echo.
@@ -30,6 +33,7 @@ if "%1" == "all" (
 		)
 		copy "localization\%%f\info.txt" "build/%%f/TrayCD"
 		copy "TrayCD.ini" "build/%%f/TrayCD"
+		"build\ini.exe" "build\%%f\TrayCD\TrayCD.ini" TrayCD Language %%f
 	)
 	
 	@echo.
