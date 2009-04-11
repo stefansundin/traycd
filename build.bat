@@ -17,7 +17,7 @@ if "%1" == "all" (
 		mkdir "build\en-US\TrayCD"
 	)
 	gcc -o "build/en-US/TrayCD/TrayCD.exe" traycd.c build/resources.o WINMM.LIB -mwindows -lshlwapi -lwininet
-	if exist "build/en-US/TrayCD/TrayCD.exe" (
+	if not exist "build/en-US/TrayCD/TrayCD.exe" (
 		exit /b
 	)
 	strip "build/en-US/TrayCD/TrayCD.exe"
