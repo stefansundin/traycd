@@ -114,6 +114,20 @@ void Error(wchar_t *func, wchar_t *info, int errorcode, int line) {
 
 //Check for update
 DWORD WINAPI _CheckForUpdate() {
+	//Check if we are connected to the internet
+	DWORD flags; //Not used
+	int tries=0; //Try at least ten times, sleep one second between each attempt
+	while (InternetGetConnectedState(&flags,0) == FALSE) {
+		tries++;
+		Sleep(1000);
+		if (tries >= 10) {
+			#ifdef DEBUG
+			Error(L"InternetGetConnectedState()",L"No internet connection.\nPlease check for update manually at "APP_URL,GetLastError(),__LINE__);
+			#endif
+			return;
+		}
+	}
+	
 	//Open connection
 	HINTERNET http, file;
 	if ((http=InternetOpen(APP_NAME" - "APP_VERSION,INTERNET_OPEN_TYPE_DIRECT,NULL,NULL,0)) == NULL) {
@@ -328,11 +342,11 @@ void ShowContextMenu(HWND hwnd) {
 int UpdateTray() {
 	traydata.hIcon=icon[iconpos];
 	
-	int tries=0; //If trying to add, try at least five times (required on some slow systems when the program is on autostart since explorer hasn't initialized the tray area)
+	int tries=0; //Try at least ten times, sleep 100 ms between each attempt
 	while (Shell_NotifyIcon((tray_added?NIM_MODIFY:NIM_ADD),&traydata) == FALSE) {
 		tries++;
-		Sleep(200);
-		if (tray_added || tries >= 20) {
+		Sleep(100);
+		if (tries >= 10) {
 			Error(L"Shell_NotifyIcon(NIM_ADD/NIM_MODIFY)",L"Failed to update tray icon.",GetLastError(),__LINE__);
 			return 1;
 		}
@@ -483,7 +497,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			SpinIcon(5);
 		}
 		else if (wmId == SWM_UPDATE) {
-			if (MessageBox(NULL, l10n->update_dialog, APP_NAME, MB_ICONINFORMATION|MB_YESNO) == IDYES) {
+			if (MessageBox(NULL, l10n->update_dialog, APP_NAME, MB_ICONINFORMATION|MB_YESNO|MB_SYSTEMMODAL) == IDYES) {
 				ShellExecute(NULL, L"open", APP_URL, NULL, NULL, SW_SHOWNORMAL);
 			}
 		}
