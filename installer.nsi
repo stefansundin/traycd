@@ -78,7 +78,7 @@ Function ${un}AddTray
 	;Add tray icon if program is running
 	FindWindow $0 "${APP_NAME}" ""
 		IntCmp $0 0 done
-		DetailPrint "Adding tray icon"
+		DetailPrint "Adding tray icon."
 		System::Call "user32::RegisterWindowMessage(t 'AddTray') i .r1"
 		SendMessage $0 $1 0 0
 	done:
@@ -125,7 +125,7 @@ Section "$(L10N_UPDATE_SECTION)" sec_update
 	NSISdl::download "${APP_UPDATEURL}" "$TEMP\${APP_NAME}-updatecheck"
 	Pop $0
 	StrCmp $0 "success" +3
-		DetailPrint "Update check failed. Error: $0"
+		DetailPrint "Update check failed. Error: $0."
 		Goto done
 	FileOpen $0 "$TEMP\${APP_NAME}-updatecheck" r
 	IfErrors done
@@ -147,7 +147,7 @@ Section "${APP_NAME} (${APP_VERSION})" sec_app
 		${If} $Upgrade_State != ${BST_CHECKED}
 			MessageBox MB_ICONINFORMATION|MB_YESNO "$(L10N_RUNNING_INSTALL)" /SD IDYES IDNO continue
 		${EndIf}
-		DetailPrint "Closing running ${APP_NAME}"
+		DetailPrint "Closing running ${APP_NAME}."
 		SendMessage $0 ${WM_CLOSE} 0 0
 		Sleep 1000
 	continue:
@@ -173,7 +173,7 @@ Section "${APP_NAME} (${APP_VERSION})" sec_app
 		Goto files_installed
 	es-ES:
 		File "build\es-ES\${APP_NAME}\info.txt"
-		WriteINIStr "${APP_NAME}.ini" "${APP_NAME}" "Language" "es-ES"
+		WriteINIStr "$INSTDIR\${APP_NAME}.ini" "${APP_NAME}" "Language" "es-ES"
 		Goto files_installed
 	
 	files_installed:
@@ -242,7 +242,7 @@ Section "Uninstall"
 	FindWindow $0 "${APP_NAME}" ""
 	IntCmp $0 0 continue
 		MessageBox MB_ICONINFORMATION|MB_YESNO "$(L10N_RUNNING_UNINSTALL)" /SD IDYES IDNO continue
-			DetailPrint "Closing running ${APP_NAME}"
+			DetailPrint "Closing running ${APP_NAME}."
 			SendMessage $0 ${WM_CLOSE} 0 0
 			Sleep 1000
 	continue:
