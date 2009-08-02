@@ -11,7 +11,7 @@
 	(at your option) any later version.
 */
 
-struct strings es_ES={
+struct strings es_ES = {
  /* menu_open */      L"Abrir",
  /* menu_close */     L"Cerrar",
  /* menu_autostart */ L"Iniciar con Windows",

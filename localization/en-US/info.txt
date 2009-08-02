@@ -11,10 +11,13 @@ Send feedback to recover89@gmail.com
 If you feel this program is useful, please consider donating money.
 You can find out how to donate on the website.
 
+TrayCD is open source, licensed under GPL.
+
 Changelog
 ---------
 1.1:
 Language can now be changed in TrayCD.ini.
+A lot of small bug fixes.
 
 1.0 - 2009-01-12:
 TrayCD now tries to detect whether the CD drive is open or closed.
