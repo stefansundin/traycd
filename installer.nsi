@@ -190,6 +190,10 @@ Section "${APP_NAME} (${APP_VERSION})" sec_app
 		File "build\es-ES\${APP_NAME}\info.txt"
 		WriteINIStr "$INSTDIR\${APP_NAME}.ini" "${APP_NAME}" "Language" "es-ES"
 		Goto files_installed
+	gl-ES:
+		File "build\gl-ES\${APP_NAME}\info.txt"
+		WriteINIStr "$INSTDIR\${APP_NAME}.ini" "${APP_NAME}" "Language" "gl-ES"
+		Goto files_installed
 	
 	files_installed:
 	

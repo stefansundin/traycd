@@ -1,0 +1,36 @@
+TrayCD
+Feito por Stefan Sundin
+Iconas de Onyx Reyes (onyxreyes@gmail.com)
+
+Expulsa e insire as túas unidades lectoras a través dunha icona na bandexa do sistema.
+Un clic co botón do medio do rato cambiará á segunda unidade.
+
+Visita a páxina web en http://traycd.googlecode.com/
+Envía a túa opinión ou comentarios (en inglés ou senón poñendo "Galician" ó comezo) a recover89@gmail.com
+
+Se atopas útil este programa, considera doar diñeiro por favor.
+Podes atopar como doar na páxina web.
+
+TrayCD é un programa de código fonte aberto, baixo a licencia GPL.
+
+Listaxe de Cambios:
+-------------------
+1.1:
+Agora pódese editar a lingua en TrayCD.ini seleccionando adecuadamente Language=lingua.
+Moitas correccións de erros.
+
+1.0 - 2009-01-12:
+TrayCD agora trata de detectar se a unidade está aberta ou pechada.
+Engadiuse a comprobación de actualización.
+
+0.3 - 2008-11-16:
+Agora pode xestionar múltiples unidades.
+Un clic co botón do medio do rato cambiará á segunda unidade.
+Novas iconas de Onyx Reyes, baixo a licencia CC-BY-SA.
+
+0.2 - 2008-06-08:
+Engadiuse a opción de arrancar ó iniciar o sistema.
+Agora volve a aparecer a icona na bandexa do sistema cando se reinicia o explorador de Windows.
+
+0.1 - 2008-06-08:
+Lanzamento inicial.
