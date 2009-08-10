@@ -124,7 +124,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 		swprintf(iconname+4, L"%02d", iconpos);
 		icon[iconpos] = LoadImage(hInst,iconname,IMAGE_ICON,0,0,LR_DEFAULTCOLOR);
 		if (icon[iconpos] == NULL) {
-			Error(L"LoadImage()", iconname, GetLastError(), __LINE__);
+			Error(L"LoadImage()", iconname, GetLastError(), TEXT(__FILE__), __LINE__);
 			PostQuitMessage(1);
 		}
 	}
@@ -242,7 +242,7 @@ int UpdateTray() {
 	while (Shell_NotifyIcon((tray_added?NIM_MODIFY:NIM_ADD),&traydata) == FALSE) {
 		tries++;
 		if (tries >= 10) {
-			Error(L"Shell_NotifyIcon(NIM_ADD/NIM_MODIFY)", L"Failed to update tray icon.", GetLastError(), __LINE__);
+			Error(L"Shell_NotifyIcon(NIM_ADD/NIM_MODIFY)", L"Failed to update tray icon.", GetLastError(), TEXT(__FILE__), __LINE__);
 			return 1;
 		}
 		Sleep(100);
@@ -260,7 +260,7 @@ int RemoveTray() {
 	}
 	
 	if (Shell_NotifyIcon(NIM_DELETE,&traydata) == FALSE) {
-		Error(L"Shell_NotifyIcon(NIM_DELETE)", L"Failed to remove tray icon.", GetLastError(), __LINE__);
+		Error(L"Shell_NotifyIcon(NIM_DELETE)", L"Failed to remove tray icon.", GetLastError(), TEXT(__FILE__), __LINE__);
 		return 1;
 	}
 	
@@ -274,14 +274,14 @@ void SetAutostart(int on) {
 	HKEY key;
 	int error = RegCreateKeyEx(HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Run",0,NULL,0,KEY_SET_VALUE,NULL,&key,NULL);
 	if (error != ERROR_SUCCESS) {
-		Error(L"RegOpenKeyEx(HKEY_CURRENT_USER,'Software\\Microsoft\\Windows\\CurrentVersion\\Run')", L"Error opening the registry.", error, __LINE__);
+		Error(L"RegOpenKeyEx(HKEY_CURRENT_USER,'Software\\Microsoft\\Windows\\CurrentVersion\\Run')", L"Error opening the registry.", error, TEXT(__FILE__), __LINE__);
 		return;
 	}
 	if (on) {
 		//Get path
 		wchar_t path[MAX_PATH];
 		if (GetModuleFileName(NULL,path,MAX_PATH) == 0) {
-			Error(L"GetModuleFileName(NULL)", L"SetAutostart()", GetLastError(), __LINE__);
+			Error(L"GetModuleFileName(NULL)", L"SetAutostart()", GetLastError(), TEXT(__FILE__), __LINE__);
 			return;
 		}
 		//Add
@@ -289,7 +289,7 @@ void SetAutostart(int on) {
 		swprintf(value,L"\"%s\"",path);
 		error = RegSetValueEx(key,APP_NAME,0,REG_SZ,(LPBYTE)value,(wcslen(value)+1)*sizeof(wchar_t));
 		if (error != ERROR_SUCCESS) {
-			Error(L"RegSetValueEx('"APP_NAME"')", L"SetAutostart()", error, __LINE__);
+			Error(L"RegSetValueEx('"APP_NAME"')", L"SetAutostart()", error, TEXT(__FILE__), __LINE__);
 			return;
 		}
 	}
@@ -297,7 +297,7 @@ void SetAutostart(int on) {
 		//Remove
 		error = RegDeleteValue(key,APP_NAME);
 		if (error != ERROR_SUCCESS) {
-			Error(L"RegDeleteValue('"APP_NAME"')", L"SetAutostart()", error, __LINE__);
+			Error(L"RegDeleteValue('"APP_NAME"')", L"SetAutostart()", error, TEXT(__FILE__), __LINE__);
 			return;
 		}
 	}
