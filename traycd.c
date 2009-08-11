@@ -204,7 +204,6 @@ void ShowContextMenu(HWND hwnd) {
 	//Compare
 	wchar_t path[MAX_PATH];
 	GetModuleFileName(NULL, path, MAX_PATH);
-	wchar_t pathcmp[MAX_PATH+10];
 	swprintf(txt, L"\"%s\"", path);
 	if (!wcscmp(txt,autostart_value)) {
 		autostart = 1;
@@ -330,7 +329,7 @@ DWORD WINAPI _ToggleCD(LPVOID arg) {
 		}
 	}
 	free(arg);
-   return 0;
+	return 0;
 }
 
 void ToggleCD(int p_n) {
