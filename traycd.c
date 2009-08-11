@@ -330,6 +330,7 @@ DWORD WINAPI _ToggleCD(LPVOID arg) {
 		}
 	}
 	free(arg);
+   return 0;
 }
 
 void ToggleCD(int p_n) {
@@ -349,6 +350,7 @@ DWORD WINAPI _SpinIcon(LPVOID arg) {
 		Sleep(20-10*difftime(timenow,timestart)/howlong);
 	}
 	free(arg);
+   return 0;
 }
 
 void SpinIcon(double p_howlong) {
