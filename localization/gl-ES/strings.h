@@ -19,7 +19,7 @@ struct strings gl_ES = {
  /* menu_about */     L"Acerca de",
  /* menu_exit */      L"Saír",
  /* update_balloon */ L"Nova versión dispoñíbel!",
- /* update_dialog */  L"Unha nova versión está dispoñíbel.\nQueres ir á páxina web?",
+ /* update_dialog */  L"Unha nova versión está dispoñíbel.\nQueres ir á páxina web?\n\n(Podes desactivar a comprobación de actualizacións en "APP_NAME".ini)",
  /* about_title */    L"Acerca de " APP_NAME,
  /* about */          APP_NAME " - " APP_VERSION "\n\
 Feito por Stefan Sundin\n\
