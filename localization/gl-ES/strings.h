@@ -24,6 +24,7 @@ struct strings gl_ES = {
  /* about */          APP_NAME " - " APP_VERSION "\n\
 Feito por Stefan Sundin\n\
 Iconas de Onyx Reyes (onyxreyes@gmail.com)\n\
+Traducido por Alexander De Sousa\n\
 \n\
 Expulsa e insire as túas unidades lectoras a través dunha icona na bandexa do sistema.\n\
 Un clic co botón do medio do rato cambiará á segunda unidade.\n\
