@@ -4,11 +4,31 @@
 	<title>TrayCD</title>
 	<link href="http://traycd.googlecode.com/svn/wiki/feed.xml" rel="self" />
 	<link href="http://code.google.com/p/traycd/" />
-	<updated>2009-01-12T23:00:00Z</updated>
+	<updated>2009-08-23T22:00:00Z</updated>
 	<author>
 		<name>Stefan Sundin</name>
 		<email>recover89@gmail.com</email>
 	</author>
+
+	<entry>
+		<id>urn:uuid:820b0be7-bb73-4321-b9a0-96c96325bf7b</id>
+		<title>TrayCD - 1.1</title>
+		<link href="http://code.google.com/p/traycd/" />
+		<updated>2009-08-23T22:00:00Z</updated>
+		<content type="html">
+Released 1.1.&lt;br/>
+This release fixes many small bugs. No major feature added. New language: Galician by Alexander De Sousa. Alexander has also helped me fix some bugs, thanks! :)&lt;br/>
+&lt;u>Changelog:&lt;u/>
+&lt;ul>
+&lt;li>Language can now be changed in TrayCD.ini.&lt;li/>
+&lt;li>A lot of small bug fixes.&lt;li/>
+&lt;ul/>
+&lt;br/>
+&lt;a href="http://code.google.com/p/traycd/">&lt;img src="http://traycd.googlecode.com/svn/wiki/website.png"/> Visit the website&lt;/a>&lt;br/>
+&lt;a href="http://traycd.googlecode.com/files/TrayCD-1.1.exe">&lt;img src="http://traycd.googlecode.com/svn/wiki/down.png"/> Download installer&lt;/a> - Archive: &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.1.7z">English&lt;/a> - &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.1%20%28Spanish%29.7z">Spanish&lt;/a> - &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.1%20%28Galician%29.7z">Galician&lt;/a>&lt;br/>
+&lt;a href="http://groups.google.com/group/recovers-tools">&lt;img src="http://traycd.googlecode.com/svn/wiki/groups.png"/> Discuss in the forum&lt;/a> (no registration required)
+		</content>
+	</entry>
 
 	<entry>
 		<id>urn:uuid:a9f3afa3-12a9-435b-8046-36726076d537</id>
