@@ -15,7 +15,7 @@ TrayCD is open source, licensed under GPL.
 
 Changelog
 ---------
-1.1:
+1.1 - 2009-08-23:
 Language can now be changed in TrayCD.ini.
 A lot of small bug fixes.
 

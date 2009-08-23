@@ -16,7 +16,7 @@ TrayCD é un programa de código fonte aberto, baixo a licencia GPL.
 
 Listaxe de Cambios:
 -------------------
-1.1:
+1.1 - 2009-08-23:
 Agora pódese editar a lingua en TrayCD.ini seleccionando adecuadamente Language=lingua.
 Moitas correccións de erros.
 

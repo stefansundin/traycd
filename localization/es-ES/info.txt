@@ -1,6 +1,6 @@
 TrayCD
 Por Stefan Sundin
-Icons by Onyx Reyes (onyxreyes@gmail.com)
+Iconos por Onyx Reyes (onyxreyes@gmail.com)
 Traducido por Fabrizio Ferri (algernon@gmail.com)
 
 Expulsa e inserta tus unidades cd-rom desde un icono de notificación.
@@ -16,7 +16,7 @@ TrayCD es un programa de código abierto bajo licencia GPL.
 
 Historial de cambios
 --------------------
-1.1:
+1.1 - 2009-08-23:
 El idioma puede cambiarse en el fichero TrayCD.ini.
 Corrección de errores.
 
