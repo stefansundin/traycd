@@ -72,20 +72,6 @@ Var Newinstallbox
 
 ;Functions
 
-!macro AddTray un
-Function ${un}AddTray
-	;Add tray icon if program is running
-	FindWindow $0 "${APP_NAME}" ""
-	IntCmp $0 0 done
-		DetailPrint "Adding tray icon."
-		System::Call "user32::RegisterWindowMessage(t 'AddTray') i .r1"
-		SendMessage $0 $1 0 0
-	done:
-FunctionEnd
-!macroend
-!insertmacro AddTray ""
-!insertmacro AddTray "un."
-
 !macro CloseApp un
 Function ${un}CloseApp
 	;Close app if running
@@ -234,7 +220,6 @@ FunctionEnd
 
 Function .onInit
 	!insertmacro MUI_LANGDLL_DISPLAY
-	Call AddTray
 	;If silent, deselect check for update
 	IfSilent 0 autostart_check
 		!insertmacro UnselectSection ${sec_update}
@@ -262,7 +247,6 @@ FunctionEnd
 
 Function un.onInit
 	!insertmacro MUI_UNGETLANGUAGE
-	Call un.AddTray
 FunctionEnd
 
 Section "Uninstall"

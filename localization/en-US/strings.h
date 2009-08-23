@@ -16,7 +16,7 @@ struct strings en_US = {
  /* menu_close */     L"Close",
  /* menu_autostart */ L"Autostart",
  /* menu_spin */      L"Spin icon",
- /* menu_update */    L"Update available",
+ /* menu_update */    L"Update available!",
  /* menu_about */     L"About",
  /* menu_exit */      L"Exit",
  /* update_balloon */ L"New version found!",
