@@ -16,6 +16,7 @@
 #include <time.h>
 #define _WIN32_IE 0x0600
 #include <windows.h>
+#include <winioctl.h>
 #include <shlwapi.h>
 #include <mmsystem.h>
 

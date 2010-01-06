@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
 		printf("Usage: %s <drive> [unlock]\n", argv[0]);
 		printf("Example: %s d\n", argv[0]);
 		printf("Example: %s d unlock\n", argv[0]);
-		printf("Note: You must have a CD in the CD-rom drive for this to work.\n", GetLastError());
+		printf("Note: You must have a CD in the CD-ROM drive for this to work.\n", GetLastError());
 		printf("Note: If you lock a drive multiple times, you must unlock it just as many times.\n", GetLastError());
 		return 0;
 	}
@@ -31,7 +31,8 @@ int main(int argc, char *argv[]) {
 	}
 	
 	// Lock/Unlock the drive
-	printf("%s cd-rom drive ... ", (lock?"Locking":"Unlocking")); fflush(stdout);
+	printf("%s cd-rom drive ... ", (lock?"Locking":"Unlocking")); 
+	fflush(stdout);
 	DWORD bytesReturned; //Not used
 	PREVENT_MEDIA_REMOVAL pmr; //This is really just a BOOL
 	pmr.PreventMediaRemoval = lock;
@@ -47,8 +48,3 @@ int main(int argc, char *argv[]) {
 	CloseHandle(device);
 	return 0;
 }
-
-// Further reading:
-// http://techsupt.winbatch.com/TS/T000001010F28.html
-// https://arkeon.dyndns.org/svn-scol/trunk/plugins/lib2d%20os%2024/tmp/source/script2.cpp
-// IOCTL_STORAGE_MEDIA_REMOVAL on MSDN
