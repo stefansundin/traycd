@@ -6,9 +6,7 @@
 struct {
 	wchar_t *code;
 	struct strings *strings;
-} 
-
-languages[] = {
+} languages[] = {
 	{L"en-US", &en_US},
 	{L"es-ES", &es_ES},
 	{L"gl-ES", &gl_ES},

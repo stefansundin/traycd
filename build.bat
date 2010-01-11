@@ -39,6 +39,8 @@ if "%1" == "all" (
 	@echo.
 	echo Building installer
 	makensis /V2 installer.nsi
+) else if "%1" == "lock" (
+	gcc -o lock.exe lock.c -mconsole -O2 -s
 ) else (
 	gcc -o TrayCD.exe traycd.c build\resources.o include\WINMM.LIB -mwindows -lshlwapi -lwininet -DDEBUG
 	

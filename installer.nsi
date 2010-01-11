@@ -174,7 +174,7 @@ Section "${APP_NAME} (${APP_VERSION})" sec_app
 	IntCmp $LANGUAGE ${LANG_ENGLISH} en-US
 	IntCmp $LANGUAGE ${LANG_SPANISH} es-ES
 	IntCmp $LANGUAGE ${LANG_GALICIAN} gl-ES
-	IntCmp $LANGUAGE ${LANG_GALICIAN} fa-IR
+	IntCmp $LANGUAGE ${LANG_FARSI} fa-IR
 	en-US:
 		File "build\en-US\${APP_NAME}\info.txt"
 		Goto files_installed

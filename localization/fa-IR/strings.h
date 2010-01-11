@@ -11,7 +11,7 @@
 	(at your option) any later version.
 */
 
-struct strings en_US = {
+struct strings fa_IR = {
  /* menu_open */      L"باز کزدن",
  /* menu_close */     L"بستن",
  /* menu_autostart */ L"شروع خودکار",

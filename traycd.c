@@ -308,12 +308,32 @@ DWORD WINAPI _ToggleCD(LPVOID arg) {
 	int n = *(int*)arg;
 	if (n <= wcslen(cdrom)) {
 		//Try to figure out if the CD tray is ejected
-		wchar_t drive[] = L"X:";
+		wchar_t drive[7] = L"X:"; //This variable is re-used below
 		drive[0] = cdrom[n];
 		wchar_t name[MAX_PATH+1];
 		if (GetVolumeInformation(drive,name,MAX_PATH+1,NULL,NULL,NULL,NULL,0) == 1) {
 			//The tray is closed and has a CD in it
 			open[n] = 0;
+		}
+		
+		//Unlock the drive
+		swprintf(drive, L"\\\\.\\%c:", cdrom[n]); // \\.\X:
+		HANDLE device = CreateFile(drive, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+		if (device == INVALID_HANDLE_VALUE) {
+			#ifdef DEBUG
+			Error(L"CreateFile()", L"Unlocking CD-ROM failed.", GetLastError(), TEXT(__FILE__), __LINE__);
+			#endif
+		}
+		else {
+			DWORD bytesReturned; //Not used
+			PREVENT_MEDIA_REMOVAL pmr = { FALSE }; //This is really just a BOOL
+			BOOL result = DeviceIoControl(device, IOCTL_STORAGE_MEDIA_REMOVAL, &pmr, sizeof(PREVENT_MEDIA_REMOVAL), NULL, 0, &bytesReturned, NULL);
+			if (result == 0) {
+				#ifdef DEBUG
+				Error(L"DeviceIoControl()", L"Unlocking CD-ROM failed.", GetLastError(), TEXT(__FILE__), __LINE__);
+				#endif
+			}
+			CloseHandle(device);
 		}
 		
 		//Toggle drive

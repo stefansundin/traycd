@@ -8,7 +8,7 @@
 !if ${L10N_VERSION} == 2
 
 !insertmacro MUI_LANGUAGE "Farsi"
-!define LANG ${LANG_ENGLISH}
+!define LANG ${LANG_FARSI}
 
 LangString L10N_UPGRADE_TITLE     ${LANG} "قبلاً نصب شده است"
 LangString L10N_UPGRADE_SUBTITLE  ${LANG} "روش نصب  ${APP_NAME} را انتخاب کنید."
