@@ -1,6 +1,5 @@
 /*
-	TrayCD - Eject and insert the cd tray via a tray icon
-	Copyright (C) 2009  Stefan Sundin (recover89@gmail.com)
+	Copyright (C) 2010  Stefan Sundin (recover89@gmail.com)
 	
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -10,95 +9,80 @@
 
 #define UNICODE
 #define _UNICODE
+#define _WIN32_IE 0x0600
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#define _WIN32_IE 0x0600
 #include <windows.h>
-#include <winioctl.h>
 #include <shlwapi.h>
 #include <mmsystem.h>
 
 //App
-#define APP_NAME      L"TrayCD"
-#define APP_VERSION   "1.1"
-#define APP_URL       L"http://traycd.googlecode.com/"
-#define APP_UPDATEURL L"http://traycd.googlecode.com/svn/wiki/latest-stable.txt"
+#define APP_NAME            L"TrayCD"
+#define APP_VERSION         "1.2"
+#define APP_URL             L"http://code.google.com/p/traycd/"
+#define APP_UPDATE_STABLE   L"http://traycd.googlecode.com/svn/wiki/latest-stable.txt"
+#define APP_UPDATE_UNSTABLE L"http://traycd.googlecode.com/svn/wiki/latest-unstable.txt"
 
 //Messages
-#define WM_ICONTRAY            WM_USER+1
+#define WM_TRAY                WM_USER+1
 #define SWM_AUTOSTART_ON       WM_APP+1
 #define SWM_AUTOSTART_OFF      WM_APP+2
-#define SWM_SPIN               WM_APP+3
-#define SWM_UPDATE             WM_APP+4
-#define SWM_ABOUT              WM_APP+5
-#define SWM_EXIT               WM_APP+6
+#define SWM_SETTINGS           WM_APP+3
+#define SWM_CHECKFORUPDATE     WM_APP+4
+#define SWM_UPDATE             WM_APP+5
+#define SWM_SPIN               WM_APP+6
+#define SWM_ABOUT              WM_APP+7
+#define SWM_EXIT               WM_APP+8
 #define SWM_TOGGLE             WM_APP+10 //10-36 reserved for toggle
 
 //Stuff missing in MinGW
+#ifndef NIIF_USER
 #define HWND_MESSAGE ((HWND)-3)
 #define NIIF_USER 4
 #define NIN_BALLOONSHOW        WM_USER+2
 #define NIN_BALLOONHIDE        WM_USER+3
 #define NIN_BALLOONTIMEOUT     WM_USER+4
 #define NIN_BALLOONUSERCLICK   WM_USER+5
-
-//Localization
-struct strings {
-	wchar_t *menu_open;
-	wchar_t *menu_close;
-	wchar_t *menu_autostart;
-	wchar_t *menu_spin;
-	wchar_t *menu_update;
-	wchar_t *menu_about;
-	wchar_t *menu_exit;
-	wchar_t *update_balloon;
-	wchar_t *update_dialog;
-	wchar_t *about_title;
-	wchar_t *about;
-};
-#include "localization/strings.h"
-struct strings *l10n = &en_US;
+#endif
 
 //Boring stuff
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
-HICON icon[15];
-NOTIFYICONDATA traydata;
+HINSTANCE g_hinst = NULL;
+HWND g_hwnd = NULL;
 UINT WM_TASKBARCREATED = 0;
-int tray_added = 0;
-struct {
-	int CheckForUpdate;
-} settings = {0};
-wchar_t txt[1000];
 
 //Cool stuff
 wchar_t cdrom[27] = L"";
 int open[26];
-int iconpos = 0;
 
-//Error() and CheckForUpdate()
-#include "include/error.h"
-#include "include/update.h"
+//Include stuff
+#include "localization/strings.h"
+#include "include/error.c"
+#include "include/autostart.c"
+#include "include/tray.c"
+#include "include/update.c"
 
 //Entry point
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, int iCmdShow) {
+	g_hinst = hInst;
+	
 	//Load settings
 	wchar_t path[MAX_PATH];
 	GetModuleFileName(NULL, path, sizeof(path)/sizeof(wchar_t));
-	PathRenameExtension(path, L".ini");
-	GetPrivateProfileString(L"Update", L"CheckForUpdate", L"0", txt, sizeof(txt)/sizeof(wchar_t), path);
-	swscanf(txt, L"%d", &settings.CheckForUpdate);
+	PathRemoveFileSpec(path);
+	wcscat(path, L"\\"APP_NAME".ini");
+	wchar_t txt[10];
 	GetPrivateProfileString(APP_NAME, L"Language", L"en-US", txt, sizeof(txt)/sizeof(wchar_t), path);
 	int i;
-	for (i=0; i < num_languages; i++) {
-		if (!wcscmp(txt,languages[i].code)) {
+	for (i=0; languages[i].code != NULL; i++) {
+		if (!wcsicmp(txt,languages[i].code)) {
 			l10n = languages[i].strings;
 			break;
 		}
 	}
 	
-	//Create window class
+	//Create window
 	WNDCLASSEX wnd;
 	wnd.cbSize = sizeof(WNDCLASSEX);
 	wnd.style = 0;
@@ -108,47 +92,15 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	wnd.hInstance = hInst;
 	wnd.hIcon = NULL;
 	wnd.hIconSm = NULL;
-	wnd.hCursor = LoadImage(NULL,IDC_ARROW,IMAGE_CURSOR,0,0,LR_DEFAULTCOLOR|LR_SHARED);
+	wnd.hCursor = LoadImage(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTCOLOR|LR_SHARED);
 	wnd.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
 	wnd.lpszMenuName = NULL;
 	wnd.lpszClassName = APP_NAME;
-	
-	//Register class
 	RegisterClassEx(&wnd);
+	g_hwnd = CreateWindowEx(0, wnd.lpszClassName, APP_NAME, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, HWND_MESSAGE, NULL, hInst, NULL);
 	
-	//Create window
-	HWND hwnd = CreateWindowEx(0, wnd.lpszClassName, APP_NAME, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, HWND_MESSAGE, NULL, hInst, NULL);
-	
-	//Load icons
-	wchar_t iconname[] = L"trayXX";
-	for (iconpos=0; iconpos <= 14; iconpos++) {
-		swprintf(iconname+4, L"%02d", iconpos);
-		icon[iconpos] = LoadImage(hInst,iconname,IMAGE_ICON,0,0,LR_DEFAULTCOLOR);
-		if (icon[iconpos] == NULL) {
-			Error(L"LoadImage()", iconname, GetLastError(), TEXT(__FILE__), __LINE__);
-			PostQuitMessage(1);
-		}
-	}
-	//Seed iconpos
-	srand(time(NULL));
-	iconpos = rand()%14;
-	
-	//Create icondata
-	traydata.cbSize = sizeof(NOTIFYICONDATA);
-	traydata.uID = 0;
-	traydata.uFlags = NIF_MESSAGE|NIF_ICON|NIF_TIP;
-	traydata.hWnd = hwnd;
-	traydata.uCallbackMessage = WM_ICONTRAY;
-	wcsncpy(traydata.szTip, APP_NAME, sizeof(traydata.szTip)/sizeof(wchar_t));
-	//Balloon tooltip
-	traydata.uTimeout = 10000;
-	wcsncpy(traydata.szInfoTitle, APP_NAME, sizeof(traydata.szInfoTitle)/sizeof(wchar_t));
-	traydata.dwInfoFlags = NIIF_USER;
-	
-	//Register TaskbarCreated so we can re-add the tray icon if explorer.exe crashes
-	WM_TASKBARCREATED = RegisterWindowMessage(L"TaskbarCreated");
-	
-	//Update tray icon
+	//Tray icon
+	InitTray();
 	UpdateTray();
 	
 	//Check for CD drives
@@ -168,8 +120,10 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	}
 	
 	//Check for update
-	if (settings.CheckForUpdate) {
-		CheckForUpdate();
+	GetPrivateProfileString(L"Update", L"CheckOnStartup", L"0", txt, sizeof(txt)/sizeof(wchar_t), path);
+	int checkforupdate = _wtoi(txt);
+	if (checkforupdate) {
+		CheckForUpdate(0);
 	}
 	
 	//Message loop
@@ -181,131 +135,10 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	return msg.wParam;
 }
 
-void ShowContextMenu(HWND hwnd) {
-	POINT pt;
-	GetCursorPos(&pt);
-	HMENU hMenu = CreatePopupMenu();
-	
-	//Open/Close
-	int i;
-	for (i=0; i < wcslen(cdrom); i++) {
-		swprintf(txt, L"%s %c:", (open[i]?l10n->menu_close:l10n->menu_open), cdrom[i]);
-		InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_TOGGLE+i, txt);
-	}
-	
-	//Check autostart
-	int autostart = 0;
-	//Registry
-	HKEY key;
-	wchar_t autostart_value[MAX_PATH+10] = L"";
-	DWORD len = sizeof(autostart_value);
-	RegOpenKeyEx(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_QUERY_VALUE, &key);
-	RegQueryValueEx(key, APP_NAME, NULL, NULL, (LPBYTE)autostart_value, &len);
-	RegCloseKey(key);
-	//Compare
-	wchar_t path[MAX_PATH];
-	GetModuleFileName(NULL, path, MAX_PATH);
-	swprintf(txt, L"\"%s\"", path);
-	if (!wcscmp(txt,autostart_value)) {
-		autostart = 1;
-	}
-	//Autostart
-	InsertMenu(hMenu, -1, MF_BYPOSITION|(autostart?MF_CHECKED:0), (autostart?SWM_AUTOSTART_OFF:SWM_AUTOSTART_ON), l10n->menu_autostart);
-	InsertMenu(hMenu, -1, MF_BYPOSITION|MF_SEPARATOR, 0, NULL);
-	
-	//Spin icon (just for fun)
-	InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_SPIN, l10n->menu_spin);
-	InsertMenu(hMenu, -1, MF_BYPOSITION|MF_SEPARATOR, 0, NULL);
-	
-	//Update
-	if (update) {
-		InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_UPDATE, l10n->menu_update);
-	}
-	
-	//About
-	InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_ABOUT, l10n->menu_about);
-	
-	//Exit
-	InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_EXIT, l10n->menu_exit);
-
-	//Track menu
-	SetForegroundWindow(hwnd);
-	TrackPopupMenu(hMenu, TPM_BOTTOMALIGN, pt.x, pt.y, 0, hwnd, NULL);
-	DestroyMenu(hMenu);
-}
-
-int UpdateTray() {
-	traydata.hIcon = icon[iconpos];
-	
-	int tries = 0; //Try at least ten times, sleep 100 ms between each attempt
-	while (Shell_NotifyIcon((tray_added?NIM_MODIFY:NIM_ADD),&traydata) == FALSE) {
-		tries++;
-		if (tries >= 10) {
-			Error(L"Shell_NotifyIcon(NIM_ADD/NIM_MODIFY)", L"Failed to update tray icon.", GetLastError(), TEXT(__FILE__), __LINE__);
-			return 1;
-		}
-		Sleep(100);
-	}
-	
-	//Success
-	tray_added = 1;
-	return 0;
-}
-
-int RemoveTray() {
-	if (!tray_added) {
-		//Tray not added
-		return 1;
-	}
-	
-	if (Shell_NotifyIcon(NIM_DELETE,&traydata) == FALSE) {
-		Error(L"Shell_NotifyIcon(NIM_DELETE)", L"Failed to remove tray icon.", GetLastError(), TEXT(__FILE__), __LINE__);
-		return 1;
-	}
-	
-	//Success
-	tray_added = 0;
-	return 0;
-}
-
-void SetAutostart(int on) {
-	//Open key
-	HKEY key;
-	int error = RegCreateKeyEx(HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Run",0,NULL,0,KEY_SET_VALUE,NULL,&key,NULL);
-	if (error != ERROR_SUCCESS) {
-		Error(L"RegCreateKeyEx(HKEY_CURRENT_USER,'Software\\Microsoft\\Windows\\CurrentVersion\\Run')", L"Error opening the registry.", error, TEXT(__FILE__), __LINE__);
-		return;
-	}
-	if (on) {
-		//Get path
-		wchar_t path[MAX_PATH];
-		if (GetModuleFileName(NULL,path,MAX_PATH) == 0) {
-			Error(L"GetModuleFileName(NULL)", L"SetAutostart()", GetLastError(), TEXT(__FILE__), __LINE__);
-			return;
-		}
-		//Add
-		wchar_t value[MAX_PATH+10];
-		swprintf(value,L"\"%s\"",path);
-		error = RegSetValueEx(key,APP_NAME,0,REG_SZ,(LPBYTE)value,(wcslen(value)+1)*sizeof(wchar_t));
-		if (error != ERROR_SUCCESS) {
-			Error(L"RegSetValueEx('"APP_NAME"')", L"SetAutostart()", error, TEXT(__FILE__), __LINE__);
-			return;
-		}
-	}
-	else {
-		//Remove
-		error = RegDeleteValue(key,APP_NAME);
-		if (error != ERROR_SUCCESS) {
-			Error(L"RegDeleteValue('"APP_NAME"')", L"SetAutostart()", error, TEXT(__FILE__), __LINE__);
-			return;
-		}
-	}
-	//Close key
-	RegCloseKey(key);
-}
-
 DWORD WINAPI _ToggleCD(LPVOID arg) {
 	int n = *(int*)arg;
+	free(arg);
+	
 	if (n <= wcslen(cdrom)) {
 		//Try to figure out if the CD tray is ejected
 		wchar_t drive[7] = L"X:"; //This variable is re-used below
@@ -342,13 +175,12 @@ DWORD WINAPI _ToggleCD(LPVOID arg) {
 		mci.lpstrDeviceType = (LPCWSTR)MCI_DEVTYPE_CD_AUDIO;
 		swprintf(drive, L"%c", cdrom[n]);
 		mci.lpstrElementName = drive;
-		if (!mciSendCommand(0,MCI_OPEN,MCI_OPEN_TYPE|MCI_OPEN_TYPE_ID|MCI_NOTIFY|MCI_OPEN_ELEMENT,(DWORD)&mci)) {
+		if (!mciSendCommand(0,MCI_OPEN,MCI_OPEN_TYPE|MCI_OPEN_TYPE_ID|MCI_NOTIFY|MCI_OPEN_ELEMENT,(DWORD_PTR)&mci)) {
 			open[n] = !open[n];
 			mciSendCommand(mci.wDeviceID, MCI_SET, (open[n]?MCI_SET_DOOR_OPEN:MCI_SET_DOOR_CLOSED), 0);
 			mciSendCommand(mci.wDeviceID, MCI_CLOSE, MCI_WAIT, 0);
 		}
 	}
-	free(arg);
 	return 0;
 }
 
@@ -358,38 +190,18 @@ void ToggleCD(int p_n) {
 	CreateThread(NULL, 0, _ToggleCD, n, 0, NULL);
 }
 
-DWORD WINAPI _SpinIcon(LPVOID arg) {
-	double howlong = *(double*)arg;
-	time_t timestart = time(NULL), timenow;
-	for (timenow=time(NULL); difftime(timenow,timestart) < howlong; timenow=time(NULL)) {
-		iconpos = (iconpos+1)%15;
-		UpdateTray();
-		//Sleep
-		//TODO: Implement some kind of sine function to make the spinning look cooler
-		Sleep(20-10*difftime(timenow,timestart)/howlong);
-	}
-	free(arg);
-   return 0;
-}
-
-void SpinIcon(double p_howlong) {
-	double *howlong = malloc(sizeof(p_howlong));
-	*howlong = p_howlong;
-	CreateThread(NULL, 0, _SpinIcon, howlong, 0, NULL);
-}
-
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-	if (msg == WM_ICONTRAY) {
+	if (msg == WM_TRAY) {
 		if (lParam == WM_LBUTTONDOWN) {
 			ToggleCD(0);
 			SpinIcon(1.5);
 		}
-		else if (lParam == WM_RBUTTONDOWN) {
-			ShowContextMenu(hwnd);
-		}
 		else if (lParam == WM_MBUTTONDOWN) {
 			ToggleCD(1);
 			SpinIcon(1.5);
+		}
+		else if (lParam == WM_RBUTTONDOWN) {
+			ShowContextMenu(hwnd);
 		}
 		else if (lParam == NIN_BALLOONUSERCLICK) {
 			SendMessage(hwnd, WM_COMMAND, SWM_UPDATE, 0);
@@ -402,7 +214,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	else if (msg == WM_COMMAND) {
 		int wmId=LOWORD(wParam), wmEvent=HIWORD(wParam);
 		if (wmId >= SWM_TOGGLE && wmId <= SWM_TOGGLE+26) {
-			int n = wmId-SWM_TOGGLE-20; //This is really weird, but for some reason wmId-SWM_TOGGLE needs to be subtracted with 20
+			int n = wmId-SWM_TOGGLE-20; //This is really weird, but for some reason wmId-SWM_TOGGLE needs to be subtracted by 20
 			ToggleCD(n);
 			SpinIcon(1.5);
 		}
@@ -412,13 +224,23 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		else if (wmId == SWM_AUTOSTART_OFF) {
 			SetAutostart(0);
 		}
-		else if (wmId == SWM_SPIN) {
-			SpinIcon(5);
+		else if (wmId == SWM_SETTINGS) {
+			wchar_t path[MAX_PATH];
+			GetModuleFileName(NULL, path, sizeof(path)/sizeof(wchar_t));
+			PathRemoveFileSpec(path);
+			wcscat(path, L"\\"APP_NAME".ini");
+			ShellExecute(NULL, L"open", path, NULL, NULL, SW_SHOWNORMAL);
+		}
+		else if (wmId == SWM_CHECKFORUPDATE) {
+			CheckForUpdate(1);
 		}
 		else if (wmId == SWM_UPDATE) {
 			if (MessageBox(NULL,l10n->update_dialog,APP_NAME,MB_ICONINFORMATION|MB_YESNO|MB_SYSTEMMODAL) == IDYES) {
 				ShellExecute(NULL, L"open", APP_URL, NULL, NULL, SW_SHOWNORMAL);
 			}
+		}
+		else if (wmId == SWM_SPIN) {
+			SpinIcon(5);
 		}
 		else if (wmId == SWM_ABOUT) {
 			MessageBox(NULL, l10n->about, l10n->about_title, MB_ICONINFORMATION|MB_OK);

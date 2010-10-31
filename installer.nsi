@@ -1,6 +1,4 @@
-;TrayCD installer
-;
-;Copyright (C) 2009  Stefan Sundin (recover89@gmail.com)
+;Copyright (C) 2010  Stefan Sundin (recover89@gmail.com)
 ;
 ;This program is free software: you can redistribute it and/or modify
 ;it under the terms of the GNU General Public License as published by
@@ -9,16 +7,16 @@
 
 
 !define APP_NAME      "TrayCD"
-!define APP_VERSION   "1.1"
-!define APP_URL       "http://traycd.googlecode.com/"
+!define APP_VERSION   "1.2"
+!define APP_URL       "http://code.google.com/p/traycd/"
 !define APP_UPDATEURL "http://traycd.googlecode.com/svn/wiki/latest-stable.txt"
-!define L10N_VERSION  2
 
 ;Libraries
 
 !include "MUI2.nsh"
 !include "Sections.nsh"
 !include "LogicLib.nsh"
+!include "x64.nsh"
 
 ;General
 
@@ -40,7 +38,6 @@ SetCompressor /SOLID lzma
 !define MUI_COMPONENTSPAGE_NODESC
 
 !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
-;!define MUI_FINISHPAGE_SHOWREADME_TEXT "Read info.txt"
 !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\info.txt"
 !define MUI_FINISHPAGE_RUN
 !define MUI_FINISHPAGE_RUN_FUNCTION "Launch"
@@ -58,17 +55,21 @@ Page custom PageUpgrade PageUpgradeLeave
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 
+;Variables
+
+Var UpgradeState
+
 ;Languages
 
 !include "localization\installer.nsh"
-
 !insertmacro MUI_RESERVEFILE_LANGDLL
 
-;Variables
-
-Var Upgrade_State
-Var Upgradebox
-Var Newinstallbox
+!macro Lang id lang
+${If} $LANGUAGE == ${id}
+	File "build\${lang}\${APP_NAME}\info.txt"
+	WriteINIStr "$INSTDIR\${APP_NAME}.ini" "${APP_NAME}" "Language" "${lang}"
+${EndIf}
+!macroend
 
 ;Functions
 
@@ -77,7 +78,7 @@ Function ${un}CloseApp
 	;Close app if running
 	FindWindow $0 "${APP_NAME}" ""
 	IntCmp $0 0 done
-		${If} $Upgrade_State != ${BST_CHECKED}
+		${If} $UpgradeState != ${BST_CHECKED}
 			StrCpy $1 "$(L10N_RUNNING)"
 			${If} "${un}" == "un."
 				StrCpy $1 "$1$\n$(L10N_RUNNING_UNINSTALL)"
@@ -100,6 +101,9 @@ FunctionEnd
 
 ;Detect previous installation
 
+Var Upgradebox
+Var Uninstallbox
+
 Function PageUpgrade
 	ReadRegStr $0 HKCU "Software\${APP_NAME}" "Install_Dir"
 	IfFileExists $0 +2
@@ -114,11 +118,14 @@ Function PageUpgrade
 	${NSD_CreateLabel} 16 60 100% 20u "$(L10N_UPGRADE_INI)"
 	
 	${NSD_CreateRadioButton} 0 95 100% 10u "$(L10N_UPGRADE_INSTALL)"
-	Pop $Newinstallbox
+	Pop $0
+	
+	${NSD_CreateRadioButton} 0 130 100% 10u "$(L10N_UPGRADE_UNINSTALL)"
+	Pop $Uninstallbox
 	
 	;Check the correct button when going back to this page
-	${If} $Upgrade_State == ${BST_UNCHECKED}
-		${NSD_Check} $Newinstallbox
+	${If} $UpgradeState == ${BST_UNCHECKED}
+		${NSD_Check} $0
 	${Else}
 		${NSD_Check} $Upgradebox
 	${EndIf}
@@ -127,7 +134,12 @@ Function PageUpgrade
 FunctionEnd
 
 Function PageUpgradeLeave
-	${NSD_GetState} $Upgradebox $Upgrade_State
+	${NSD_GetState} $Upgradebox $UpgradeState
+	${NSD_GetState} $Uninstallbox $0
+	${If} $0 == ${BST_CHECKED}
+		Exec "$INSTDIR\Uninstall.exe"
+		Quit
+	${EndIf}
 FunctionEnd
 
 ;Installer
@@ -168,31 +180,21 @@ Section "${APP_NAME} (${APP_VERSION})" sec_app
 		Rename "${APP_NAME}.ini" "${APP_NAME}-old.ini"
 	
 	;Install files
-	File "build\en-US\${APP_NAME}\${APP_NAME}.exe"
-	File "build\en-US\${APP_NAME}\${APP_NAME}.ini"
+	!ifdef x64
+	${If} ${RunningX64}
+		File "build\x64\${APP_NAME}.exe"
+	${Else}
+		File "build\${APP_NAME}.exe"
+	${EndIf}
+	!else
+	File "build\${APP_NAME}.exe"
+	!endif
+	File "${APP_NAME}.ini"
 	
-	IntCmp $LANGUAGE ${LANG_ENGLISH} en-US
-	IntCmp $LANGUAGE ${LANG_SPANISH} es-ES
-	IntCmp $LANGUAGE ${LANG_GALICIAN} gl-ES
-	IntCmp $LANGUAGE ${LANG_FARSI} fa-IR
-	en-US:
-		File "build\en-US\${APP_NAME}\info.txt"
-		Goto files_installed
-	es-ES:
-		File "build\es-ES\${APP_NAME}\info.txt"
-		WriteINIStr "$INSTDIR\${APP_NAME}.ini" "${APP_NAME}" "Language" "es-ES"
-		Goto files_installed
-	gl-ES:
-		File "build\gl-ES\${APP_NAME}\info.txt"
-		WriteINIStr "$INSTDIR\${APP_NAME}.ini" "${APP_NAME}" "Language" "gl-ES"
-		Goto files_installed
-	fa-IR:
-		File "build\fa-IR\${APP_NAME}\info.txt"
-		WriteINIStr "$INSTDIR\${APP_NAME}.ini" "${APP_NAME}" "Language" "fa-IR"
-		Goto files_installed
-				
-	
-	files_installed:
+	!insertmacro Lang ${LANG_ENGLISH}  en-US
+	!insertmacro Lang ${LANG_SPANISH}  es-ES
+	!insertmacro Lang ${LANG_GALICIAN} gl-ES
+	!insertmacro Lang ${LANG_FARSI}    fa-IR
 	
 	;Create uninstaller
 	WriteUninstaller "Uninstall.exe"
@@ -218,18 +220,28 @@ FunctionEnd
 
 ;Used when upgrading to skip the components and directory pages
 Function SkipPage
-	${If} $Upgrade_State == ${BST_CHECKED}
+	${If} $UpgradeState == ${BST_CHECKED}
 		!insertmacro UnselectSection ${sec_shortcut}
 		Abort
 	${EndIf}
 FunctionEnd
 
 Function .onInit
+	;Detect x64
+	!ifdef x64
+	${If} ${RunningX64}
+		SectionSetText ${sec_app} "${APP_NAME} (x64)"
+		;Only set x64 installation dir if not already installed
+		ReadRegStr $0 HKCU "Software\${APP_NAME}" "Install_Dir"
+		IfFileExists $0 +2
+			StrCpy $INSTDIR "$PROGRAMFILES64\${APP_NAME}"
+	${EndIf}
+	!endif
+	;Display language selection
 	!insertmacro MUI_LANGDLL_DISPLAY
 	;If silent, deselect check for update
-	IfSilent 0 autostart_check
+	IfSilent 0 +2
 		!insertmacro UnselectSection ${sec_update}
-	autostart_check:
 	;Determine current autostart setting
 	ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "${APP_NAME}"
 	IfErrors done
