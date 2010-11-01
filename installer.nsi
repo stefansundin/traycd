@@ -18,7 +18,7 @@
 !include "LogicLib.nsh"
 !include "x64.nsh"
 
-;General
+; General
 
 Name "${APP_NAME} ${APP_VERSION}"
 OutFile "build/${APP_NAME}-${APP_VERSION}.exe"
@@ -29,7 +29,7 @@ ShowInstDetails hide
 ShowUninstDetails show
 SetCompressor /SOLID lzma
 
-;Interface
+; Interface
 
 !define MUI_LANGDLL_REGISTRY_ROOT "HKCU" 
 !define MUI_LANGDLL_REGISTRY_KEY "Software\${APP_NAME}" 
@@ -42,7 +42,7 @@ SetCompressor /SOLID lzma
 !define MUI_FINISHPAGE_RUN
 !define MUI_FINISHPAGE_RUN_FUNCTION "Launch"
 
-;Pages
+; Pages
 
 Page custom PageUpgrade PageUpgradeLeave
 !define MUI_PAGE_CUSTOMFUNCTION_PRE SkipPage
@@ -55,11 +55,11 @@ Page custom PageUpgrade PageUpgradeLeave
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 
-;Variables
+; Variables
 
 Var UpgradeState
 
-;Languages
+; Languages
 
 !include "localization\installer.nsh"
 !insertmacro MUI_RESERVEFILE_LANGDLL
@@ -71,7 +71,7 @@ ${If} $LANGUAGE == ${id}
 ${EndIf}
 !macroend
 
-;Functions
+; Functions
 
 !macro CloseApp un
 Function ${un}CloseApp
@@ -99,7 +99,7 @@ FunctionEnd
 !insertmacro CloseApp ""
 !insertmacro CloseApp "un."
 
-;Detect previous installation
+; Detect previous installation
 
 Var Upgradebox
 Var Uninstallbox
@@ -142,7 +142,7 @@ Function PageUpgradeLeave
 	${EndIf}
 FunctionEnd
 
-;Installer
+; Installer
 
 Section "$(L10N_UPDATE_SECTION)" sec_update
 	NSISdl::download "${APP_UPDATEURL}" "$TEMP\${APP_NAME}-updatecheck"
@@ -240,8 +240,9 @@ Function .onInit
 	;Display language selection
 	!insertmacro MUI_LANGDLL_DISPLAY
 	;If silent, deselect check for update
-	IfSilent 0 +2
+	IfSilent 0 autostart_check
 		!insertmacro UnselectSection ${sec_update}
+	autostart_check:
 	;Determine current autostart setting
 	ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "${APP_NAME}"
 	IfErrors done
@@ -261,7 +262,7 @@ Function .onInstSuccess
 		Call Launch
 FunctionEnd
 
-;Uninstaller
+; Uninstaller
 
 Function un.onInit
 	!insertmacro MUI_UNGETLANGUAGE
@@ -275,7 +276,7 @@ Section "Uninstall"
 	Delete /REBOOTOK "$INSTDIR\${APP_NAME}-old.ini"
 	Delete /REBOOTOK "$INSTDIR\info.txt"
 	Delete /REBOOTOK "$INSTDIR\Uninstall.exe"
-	RMDir /REBOOTOK "$INSTDIR"
+	RMDir  /REBOOTOK "$INSTDIR"
 
 	Delete /REBOOTOK "$SMPROGRAMS\${APP_NAME}.lnk"
 
