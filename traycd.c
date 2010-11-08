@@ -187,7 +187,8 @@ DWORD WINAPI _ToggleCD(LPVOID arg) {
 void ToggleCD(int p_n) {
 	int *n = malloc(sizeof(p_n));
 	*n = p_n;
-	CreateThread(NULL, 0, _ToggleCD, n, 0, NULL);
+	HANDLE thread = CreateThread(NULL, 0, _ToggleCD, n, 0, NULL);
+	CloseHandle(thread);
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
