@@ -67,21 +67,6 @@ int open[26];
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, int iCmdShow) {
 	g_hinst = hInst;
 	
-	//Load settings
-	wchar_t path[MAX_PATH];
-	GetModuleFileName(NULL, path, sizeof(path)/sizeof(wchar_t));
-	PathRemoveFileSpec(path);
-	wcscat(path, L"\\"APP_NAME".ini");
-	wchar_t txt[10];
-	GetPrivateProfileString(APP_NAME, L"Language", L"en-US", txt, sizeof(txt)/sizeof(wchar_t), path);
-	int i;
-	for (i=0; languages[i].code != NULL; i++) {
-		if (!wcsicmp(txt,languages[i].code)) {
-			l10n = languages[i].strings;
-			break;
-		}
-	}
-	
 	//Create window
 	WNDCLASSEX wnd;
 	wnd.cbSize = sizeof(WNDCLASSEX);
@@ -98,6 +83,21 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	wnd.lpszClassName = APP_NAME;
 	RegisterClassEx(&wnd);
 	g_hwnd = CreateWindowEx(0, wnd.lpszClassName, APP_NAME, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, HWND_MESSAGE, NULL, hInst, NULL);
+	
+	//Load settings
+	wchar_t path[MAX_PATH];
+	GetModuleFileName(NULL, path, sizeof(path)/sizeof(wchar_t));
+	PathRemoveFileSpec(path);
+	wcscat(path, L"\\"APP_NAME".ini");
+	wchar_t txt[10];
+	GetPrivateProfileString(APP_NAME, L"Language", L"en-US", txt, sizeof(txt)/sizeof(wchar_t), path);
+	int i;
+	for (i=0; languages[i].code != NULL; i++) {
+		if (!wcsicmp(txt,languages[i].code)) {
+			l10n = languages[i].strings;
+			break;
+		}
+	}
 	
 	//Tray icon
 	InitTray();
