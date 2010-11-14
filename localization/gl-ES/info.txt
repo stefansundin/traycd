@@ -7,11 +7,10 @@ Expulsa e insire as túas unidades lectoras a través dunha icona na bandexa do si
 Un clic co botón do medio do rato cambiará á segunda unidade.
 
 Visita a páxina web en http://traycd.googlecode.com/
-Envía a túa opinión ou comentarios (en inglés ou senón poñendo "Galician" ó comezo) a recover89@gmail.com
+Visita a páxina web do autor en http://stefansundin.com/
 
 Se este programa é útil para ti, considera doar diñeiro por favor.
-Podes atopar como doar na páxina web.
-
+Podes descubrir como doar na páxina web.
 TrayCD é un programa de código fonte aberto, baixo a licencia GPL.
 
 Listaxe de Cambios:

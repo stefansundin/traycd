@@ -7,11 +7,10 @@ Expulsa e inserta tus unidades cd-rom desde un icono de notificación.
 El clic central en el icono actuará sobre la segunda unidad óptica.
 
 Visita la página web en http://traycd.googlecode.com/
-Envía comentarios a recover89@gmail.com
+Visita la página web del autor en http://stefansundin.com/
 
 Si opinas que este programa es útil, por favor, toma en consideración realizar un donativo. 
 Encontrarás las instrucciones en la página web.
-
 TrayCD es un programa de código abierto bajo licencia GPL.
 
 Historial de cambios
