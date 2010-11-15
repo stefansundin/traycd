@@ -11,7 +11,7 @@ LangString L10N_UPGRADE_HEADER    ${LANG} "برنامه‌ی  ${APP_NAME} قبل
 LangString L10N_UPGRADE_UPGRADE   ${LANG} "به‌روزرسانی ${APP_NAME} به ${APP_VERSION}."
 LangString L10N_UPGRADE_INI       ${LANG} "تنطیمات قبلی شما در پرونده‌ی ذخیره می‌شود ${APP_NAME}-old.ini."
 LangString L10N_UPGRADE_INSTALL   ${LANG} "نصب در مسیری تازه"
-LangString L10N_UPGRADE_UNINSTALL ${LANG} "&Uninstall ${APP_NAME}."
+LangString L10N_UPGRADE_UNINSTALL ${LANG} "پاک کردن ${APP_NAME}."
 LangString L10N_UPDATE_SECTION    ${LANG} "بررسی برای به‌روزرسانی قبل از نصب"
 LangString L10N_UPDATE_DIALOG     ${LANG} "نسخه‌ی جدیدی موجود است.$\nآیا نصب متوقف شده و به وب‌گاه مراجعه می‌کنید؟"
 LangString L10N_RUNNING           ${LANG} "${APP_NAME} در حال اجراست، بسته شود؟"

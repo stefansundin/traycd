@@ -10,25 +10,25 @@
 struct strings fa_IR = {
  /* menu_open      */ L"باز کزدن %c:",
  /* menu_close     */ L"بستن %c:",
- /* menu_options   */ L"Options",
+ /* menu_options   */ L"گزینه‌ها",
  /* menu_autostart */ L"شروع خودکار",
- /* menu_settings  */ L"Open settings",
- /* menu_chkupdate */ L"Check for update",
+ /* menu_settings  */ L"بازکردن تنظیمات",
+ /* menu_chkupdate */ L"بررسی نسخه‌ی به‌روز",
  /* menu_update    */ L"نسخه‌ی به‌هنگام",
  /* menu_spin      */ L"چرخش آیکون",
  /* menu_about     */ L"درباره",
  /* menu_exit      */ L"خروج",
  /* update_balloon */ L"نسخه‌ی جدید!",
  /* update_dialog  */ L"نسخه‌ی جدید موجود است\nمراجعه به وب‌گاه؟\n\n(شما می‌توانید یافتن نسخه‌ی به‌هنگام را در پرونده‌ی غیر فعال کنید "APP_NAME".ini)",
- /* update_nonew   */ L"No update available.",
- /* about_title    */ L"درباره " APP_NAME,
+ /* update_nonew   */ L"نسخه‌ی به‌روز وجود ندارد.",
+ /* about_title    */ L"‌درباره‌ی " APP_NAME,
  /* about          */ APP_NAME " - " APP_VERSION "\n\
 نوشته شده توسط Stefan Sundin\n\
 آیکون‌ها کاری از Onyx Reyes (onyxreyes@gmail.com)\n\
 \n\
-خروج و بستن لوح‌خوان توسط آیکون واقع در قرارگاه سیستم.\n\
+خروج و بستن لوح‌خوان توسط آیکون واقع در قرارگاه رایانه.\n\
 با میان‌کلیک به لوح‌خوان بعدی اشاره می‌شود.\n\
 \n\
 وب‌گاه را در ببینید. "APP_URL"\n\
-ارسال پیش‌نهادات به recover89@gmail.com"
+مشاهده‌ی وب‌گاه پدیدآورنده‌ در http://stefansundin.com"
 };
