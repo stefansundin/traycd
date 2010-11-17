@@ -4,7 +4,7 @@ Iconas de Onyx Reyes (onyxreyes@gmail.com)
 Traducido por Alexander De Sousa
 
 Expulsa e insire as túas unidades lectoras a través dunha icona na bandexa do sistema.
-Un clic co botón do medio do rato cambiará á segunda unidade.
+Un clic co botón do medio do rato cambia á segunda unidade.
 
 Visita a páxina web en http://traycd.googlecode.com/
 Visita a páxina web do autor en http://stefansundin.com/
@@ -15,8 +15,13 @@ TrayCD é un programa de código fonte aberto, baixo a licencia GPL.
 
 Listaxe de Cambios:
 -------------------
+1.2:
+Engadiuse un executable de 64-bits. O instalador escollerá a versión correcta automáticamente.
+Engadiuse unha comprobación manual de actualizacións no menú da bandexa do sistema.
+Arranxouse o erro Shell_NotifyIcon que aparecía as veces ó autoiniciar TrayCD.
+
 1.1 - 2009-08-23:
-Agora pódese editar a lingua en TrayCD.ini seleccionando adecuadamente Language=lingua.
+Agora pódese editar a lingua en TrayCD.ini.
 Moitas correccións de erros.
 
 1.0 - 2009-01-12:
