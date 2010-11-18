@@ -15,6 +15,11 @@ TrayCD es un programa de código abierto bajo licencia GPL.
 
 Historial de cambios
 --------------------
+1.2:
+Se añadió un ejecutable de 64-bits, el programa de instalación seleccionará el correcto.
+Se añadió una opción de comprobación manual de actualizaciones en el menú de la bandeja del sistema.
+Se arregló el error Shell_NotifyIcon que aparecía para algunas personas al iniciar TrayCD con el sitema.
+
 1.1 - 2009-08-23:
 El idioma puede cambiarse en el fichero TrayCD.ini.
 Corrección de errores.
