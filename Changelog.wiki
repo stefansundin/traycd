@@ -2,6 +2,12 @@
 
 Check [http://traycd.googlecode.com/svn/trunk/localization/en-US/info.txt info.txt] if there seems to be something missing. Note that info.txt can contain changes for upcoming versions.
 
+
+*1.2* - 2010-11-19:
+  * Added 64-bit executable. The installer will automatically install the correct executable.
+  * Added manual update check to the tray menu.
+  * Fixed the Shell_NotifyIcon error that appeared for some when TrayCD was on autostart.
+
 *1.1* - 2009-08-23:
   * Language can now be changed in TrayCD.ini.
   * A lot of small bug fixes.
