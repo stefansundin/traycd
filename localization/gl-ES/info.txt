@@ -15,7 +15,7 @@ TrayCD é un programa de código fonte aberto, baixo a licencia GPL.
 
 Listaxe de Cambios:
 -------------------
-1.2:
+1.2 - 2010-11-19:
 Engadiuse un executable de 64-bits. O instalador escollerá a versión correcta automáticamente.
 Engadiuse unha comprobación manual de actualizacións no menú da bandexa do sistema.
 Arranxouse o erro Shell_NotifyIcon que aparecía as veces ó autoiniciar TrayCD.

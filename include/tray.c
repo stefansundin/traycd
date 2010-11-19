@@ -126,6 +126,8 @@ void ShowContextMenu(HWND hwnd) {
 
 DWORD WINAPI _SpinIcon(LPVOID arg) {
 	double howlong = *(double*)arg;
+	free(arg);
+	
 	time_t timestart = time(NULL), timenow;
 	for (timenow=time(NULL); difftime(timenow,timestart) < howlong; timenow=time(NULL)) {
 		iconpos = (iconpos+1)%15;
@@ -134,12 +136,12 @@ DWORD WINAPI _SpinIcon(LPVOID arg) {
 		//TODO: Implement some kind of sine function to make the spinning look cooler
 		Sleep(20-10*difftime(timenow,timestart)/howlong);
 	}
-	free(arg);
-   return 0;
+	return 0;
 }
 
 void SpinIcon(double p_howlong) {
 	double *howlong = malloc(sizeof(p_howlong));
 	*howlong = p_howlong;
-	CreateThread(NULL, 0, _SpinIcon, howlong, 0, NULL);
+	HANDLE thread = CreateThread(NULL, 0, _SpinIcon, howlong, 0, NULL);
+	CloseHandle(thread);
 }

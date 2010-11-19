@@ -14,7 +14,7 @@ TrayCD is open source, licensed under GPL.
 
 Changelog
 ---------
-1.2:
+1.2 - 2010-11-19:
 Added 64-bit executable. The installer will automatically install the correct executable.
 Added manual update check to the tray menu.
 Fixed the Shell_NotifyIcon error that appeared for some when TrayCD was on autostart.
