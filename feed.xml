@@ -7,8 +7,35 @@
 	<updated>2009-12-25T22:00:00Z</updated>
 	<author>
 		<name>Stefan Sundin</name>
+		<uri>http://stefansundin.com/</uri>
 		<email>recover89@gmail.com</email>
 	</author>
+
+	<entry>
+		<id>urn:uuid:a19a27be-05be-4e49-be9b-ec5ac578fd3e</id>
+		<title>TrayCD - 1.2</title>
+		<link href="http://code.google.com/p/traycd/" />
+		<updated>2010-11-19T22:45:00Z</updated>
+		<author><name>Stefan Sundin</name></author>
+		<content type="html">
+Released 1.2.&lt;br/>
+This release fixes a couple of minor bugs. The new version is also available in 64-bit. The installer will automatically install the correct executable. New language: Farsi by Samad Alaamati. For more details, see the changelog below.&lt;br/>
+&lt;br/>
+&lt;u>Changelog:&lt;/u>
+&lt;ul>
+&lt;li>Added 64-bit executable. The installer will automatically install the correct executable.&lt;/li>
+&lt;li>Added manual update check to the tray menu.&lt;/li>
+&lt;li>Fixed the &lt;tt>Shell_NotifyIcon&lt;/tt> error that appeared for some when TrayCD was on autostart. &lt;/li>
+&lt;/ul>
+&lt;a href="http://code.google.com/p/traycd/">&lt;img src="http://traycd.googlecode.com/svn/wiki/website.png"/> Visit the website&lt;/a>&lt;br/>
+&lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2.exe">&lt;img src="http://traycd.googlecode.com/svn/wiki/down.png"/> Download installer&lt;/a>
+ - Archive: &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2.7z">English&lt;/a> (&lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2%20%28x64%29.7z">x64&lt;/a>)
+ - &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2%20%28Spanish%29.7z">Spanish&lt;/a> (&lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2%20%28Spanish%2C%20x64%29.7z">x64&lt;/a>)
+ - &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2%20%28Galician%29.7z">Galician&lt;/a> (&lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2%20%28Galician%2C%20x64%29.7z">x64&lt;/a>) - &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2%20%28Farsi%29.7z">Farsi&lt;/a> (&lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2%20%28Farsi%2C%20x64%29.7z">x64&lt;/a>)&lt;br/>
+&lt;a href="http://groups.google.com/group/recovers-tools">&lt;img src="http://traycd.googlecode.com/svn/wiki/groups.png"/> Discuss in the forum&lt;/a> (no registration required)&lt;br/>
+&lt;a href="http://stefansundin.com/">&lt;img src="http://traycd.googlecode.com/svn/wiki/website.png"/> Visit the author's website&lt;/a>
+		</content>
+	</entry>
 
 	<entry>
 		<id>urn:uuid:1dbefaed-6e66-4c90-a008-1d859482ecda</id>
@@ -41,46 +68,6 @@ This release fixes many small bugs. No major feature added. New language: Galici
 &lt;a href="http://code.google.com/p/traycd/">&lt;img src="http://traycd.googlecode.com/svn/wiki/website.png"/> Visit the website&lt;/a>&lt;br/>
 &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.1.exe">&lt;img src="http://traycd.googlecode.com/svn/wiki/down.png"/> Download installer&lt;/a> - Archive: &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.1.7z">English&lt;/a> - &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.1%20%28Spanish%29.7z">Spanish&lt;/a> - &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.1%20%28Galician%29.7z">Galician&lt;/a>&lt;br/>
 &lt;a href="http://groups.google.com/group/recovers-tools">&lt;img src="http://traycd.googlecode.com/svn/wiki/groups.png"/> Discuss in the forum&lt;/a> (no registration required)
-		</content>
-	</entry>
-
-	<entry>
-		<id>urn:uuid:a9f3afa3-12a9-435b-8046-36726076d537</id>
-		<title>TrayCD - 1.0</title>
-		<link href="http://code.google.com/p/traycd/" />
-		<updated>2009-01-12T23:00:00Z</updated>
-		<content type="html">
-Released 1.0.&lt;br/>
-Bumping the version to 1.0 since I think TrayCD now accomplishes what I set out for it to do. TrayCD is now available in Spanish thanks to Fabrizio Ferri.&lt;br/>
-I have also opened &lt;a href="http://groups.google.com/group/recovers-tools"> a forum&lt;/a> which I hope you'll use to discuss TrayCD and my other tools, let me know what's good and what's bad.&lt;br/>
-I have also gotten some reports that my tools show up on some antivirus scanners, these are all false positives! I will try to report it to the antivirus vendors.&lt;br/>
-Finally, I would like to let you know that I have put donating details on the site, so if you feel this program is useful, please consider &lt;a href="http://code.google.com/p/traycd/wiki/Donate">donating money&lt;/a>.
-		</content>
-	</entry>
-
-	<entry>
-		<id>urn:uuid:e6aa21f2-7708-4182-8c64-d8e895aa7f7b</id>
-		<title>TrayCD - 0.3</title>
-		<link href="http://code.google.com/p/traycd/downloads/detail?name=TrayCD-0.3.7z" />
-		<updated>2008-11-16T01:18:00Z</updated>
-		<content type="text">
-Changelog:
-* Can now manage multiple cdrom drives.
-* Use middle click on tray to open second drive.
-* New icons by Onyx Reyes, licensed under CC-BY-SA.
-		</content>
-	</entry>
-
-	<entry>
-		<id>urn:uuid:7d5204b3-4e7f-41ad-9ecf-76ab18d77b3d</id>
-		<title>This feed</title>
-		<link href="http://code.google.com/p/traycd/" />
-		<updated>2008-11-16T01:15:00Z</updated>
-		<content type="html">
-Hi everyone.&lt;br/>
-This feed will let you know when there's any update to TrayCD.&lt;br/>
-There's also another feed available &lt;a href="http://superf4.googlecode.com/svn/wiki/all.xml">here&lt;/a> which will let you know if there's an update to any of programs.&lt;br/>
-You can take a look at all my programs &lt;a href="http://code.google.com/u/recover89/">here&lt;/a>.
 		</content>
 	</entry>
 </feed>
