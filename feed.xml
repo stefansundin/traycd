@@ -4,12 +4,28 @@
 	<title>TrayCD</title>
 	<link href="http://traycd.googlecode.com/svn/wiki/feed.xml" rel="self" />
 	<link href="http://code.google.com/p/traycd/" />
-	<updated>2009-12-25T22:00:00Z</updated>
+	<updated>2010-12-30T21:20:00Z</updated>
 	<author>
 		<name>Stefan Sundin</name>
 		<uri>http://stefansundin.com/</uri>
 		<email>recover89@gmail.com</email>
 	</author>
+
+	<entry>
+		<id>urn:uuid:242a3189-6873-4a13-be72-f8fe1cab5279</id>
+		<title>How to compile my programs</title>
+		<link href="http://code.google.com/p/traycd/" />
+		<updated>2010-12-30T21:20:00Z</updated>
+		<author><name>Stefan Sundin</name></author>
+		<content type="html">
+I have made a video explaining how to compile SuperF4, which is another program of mine. The instructions also work just as well with TrayCD. This might be of interest if you are learning programming and want to make your own modifications to TrayCD. Go to the &lt;a href="http://code.google.com/p/traycd/wiki/Build">Build&lt;/a> wiki page to see it.&lt;br/>
+&lt;br/>
+&lt;a href="http://code.google.com/p/traycd/">&lt;img src="http://traycd.googlecode.com/svn/wiki/website.png"/> Visit the website&lt;/a>&lt;br/>
+&lt;a href="http://www.youtube.com/watch?v=4ENwQxSr_So">&lt;img src="http://www.youtube.com/favicon.ico"/> Watch the video on YouTube&lt;/a>&lt;br/>
+&lt;a href="http://groups.google.com/group/recovers-tools">&lt;img src="http://traycd.googlecode.com/svn/wiki/groups.png"/> Discuss in the forum&lt;/a> (no registration required)&lt;br/>
+&lt;a href="http://stefansundin.com/">&lt;img src="http://traycd.googlecode.com/svn/wiki/website.png"/> Visit the author's website&lt;/a>
+		</content>
+	</entry>
 
 	<entry>
 		<id>urn:uuid:a19a27be-05be-4e49-be9b-ec5ac578fd3e</id>
@@ -25,7 +41,7 @@ This release fixes a couple of minor bugs. The new version is also available in 
 &lt;ul>
 &lt;li>Added 64-bit executable. The installer will automatically install the correct executable.&lt;/li>
 &lt;li>Added manual update check to the tray menu.&lt;/li>
-&lt;li>Fixed the &lt;tt>Shell_NotifyIcon&lt;/tt> error that appeared for some when TrayCD was on autostart. &lt;/li>
+&lt;li>Fixed the &lt;tt>Shell_NotifyIcon&lt;/tt> error that appeared for some when TrayCD was on autostart.&lt;/li>
 &lt;/ul>
 &lt;a href="http://code.google.com/p/traycd/">&lt;img src="http://traycd.googlecode.com/svn/wiki/website.png"/> Visit the website&lt;/a>&lt;br/>
 &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2.exe">&lt;img src="http://traycd.googlecode.com/svn/wiki/down.png"/> Download installer&lt;/a>
