@@ -13,13 +13,13 @@ taskkill /IM TrayCD.exe
 if not exist build. mkdir build
 
 if "%1" == "all" (
-	%prefix32%windres -o build\traycd.o include\traycd.rc
-	%prefix32%gcc -o build\ini.exe include\ini.c -lshlwapi
-	
 	@echo.
 	echo Building binaries
+	%prefix32%windres -o build\traycd.o include\traycd.rc
 	%prefix32%gcc -o "build\TrayCD.exe" traycd.c build\traycd.o include\winmm.lib -mwindows -lshlwapi -lwininet -O2 -s
 	if not exist "build\TrayCD.exe". exit /b
+	
+	%prefix32%gcc -o build\ini.exe include\ini.c -lshlwapi
 	
 	if "%2" == "x64" (
 		if not exist "build\x64". mkdir "build\x64"
@@ -33,13 +33,11 @@ if "%1" == "all" (
 		echo Putting together %%f
 		if not exist "build\%%f\TrayCD". mkdir "build\%%f\TrayCD"
 		copy "build\TrayCD.exe" "build\%%f\TrayCD"
-		copy "localization\%%f\info.txt" "build\%%f\TrayCD"
 		copy "TrayCD.ini" "build\%%f\TrayCD"
 		"build\ini.exe" "build\%%f\TrayCD\TrayCD.ini" TrayCD Language %%f
 		if "%2" == "x64" (
 			if not exist "build\x64\%%f\TrayCD". mkdir "build\x64\%%f\TrayCD"
 			copy "build\x64\TrayCD.exe" "build\x64\%%f\TrayCD"
-			copy "build\%%f\TrayCD\info.txt" "build\x64\%%f\TrayCD"
 			copy "build\%%f\TrayCD\TrayCD.ini" "build\x64\%%f\TrayCD"
 		)
 	)

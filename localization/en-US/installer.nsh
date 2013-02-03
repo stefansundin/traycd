@@ -14,12 +14,7 @@ LangString L10N_UPGRADE_HEADER    ${LANG} "${APP_NAME} is already installed on t
 LangString L10N_UPGRADE_UPGRADE   ${LANG} "&Upgrade ${APP_NAME} to ${APP_VERSION}."
 LangString L10N_UPGRADE_INI       ${LANG} "Your existing settings will be copied to ${APP_NAME}-old.ini."
 LangString L10N_UPGRADE_INSTALL   ${LANG} "&Install to a new location."
-LangString L10N_UPGRADE_UNINSTALL ${LANG} "&Uninstall ${APP_NAME}."
-LangString L10N_UPDATE_SECTION    ${LANG} "Check for update before installing"
+LangString L10N_UPGRADE_UNINSTALL ${LANG} "Unins&tall ${APP_NAME}."
 LangString L10N_UPDATE_DIALOG     ${LANG} "A new version is available.$\nAbort install and go to website?"
-LangString L10N_RUNNING           ${LANG} "${APP_NAME} is running. Close?"
-LangString L10N_RUNNING_UNINSTALL ${LANG} "If you choose No, ${APP_NAME} will be completely removed on next reboot."
-LangString L10N_SHORTCUT          ${LANG} "Start Menu Shortcut"
-LangString L10N_AUTOSTART         ${LANG} "Autostart"
 
 !undef LANG

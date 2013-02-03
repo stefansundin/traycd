@@ -8,8 +8,9 @@
 */
 
 struct strings es_ES = {
- /* menu_open      */ L"Abrir %c:",
- /* menu_close     */ L"Cerrar %c:",
+ /* menu_nodrives  */ L"No hay unidades detectadas",
+ /* menu_open      */ L"Abrir %hc:",
+ /* menu_close     */ L"Cerrar %hc:",
  /* menu_options   */ L"Opciones",
  /* menu_autostart */ L"Iniciar con Windows",
  /* menu_settings  */ L"Abrir configuración",
@@ -19,7 +20,7 @@ struct strings es_ES = {
  /* menu_about     */ L"Acerca de",
  /* menu_exit      */ L"Salir",
  /* update_balloon */ L"¡Nueva versión disponible!",
- /* update_dialog  */ L"Hay una nueva versión disponible.\n¿Ir a la página web?\n\nPuedes desactivar la comprobación automática de actualizaciones en la configuración.",
+ /* update_dialog  */ L"Hay una nueva versión disponible. ¿Ir a la página web?\n\nPuedes desactivar la comprobación automática de actualizaciones en la configuración.",
  /* update_nonew   */ L"No hay actualizaciones disponibles.",
  /* about_title    */ L"Acerca de " APP_NAME,
  /* about          */ APP_NAME " - " APP_VERSION "\n\

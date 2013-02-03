@@ -1,6 +1,6 @@
 /*
 	Tray functions.
-	Copyright (C) 2010  Stefan Sundin (recover89@gmail.com)
+	Copyright (C) 2013  Stefan Sundin (recover89@gmail.com)
 	
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ int InitTray() {
 	}
 	//Seed iconpos
 	srand(time(NULL));
-	iconpos = rand()%14;
+	iconpos = rand()%15;
 	
 	//Create icondata
 	tray.cbSize = sizeof(NOTIFYICONDATA);
@@ -37,10 +37,10 @@ int InitTray() {
 	tray.uFlags = NIF_MESSAGE|NIF_ICON|NIF_TIP;
 	tray.hWnd = g_hwnd;
 	tray.uCallbackMessage = WM_TRAY;
-	wcsncpy(tray.szTip, APP_NAME, sizeof(tray.szTip)/sizeof(wchar_t));
+	wcsncpy(tray.szTip, TEXT(APP_NAME), sizeof(tray.szTip)/sizeof(wchar_t));
 	//Balloon tooltip
 	tray.uTimeout = 10000;
-	wcsncpy(tray.szInfoTitle, APP_NAME, sizeof(tray.szInfoTitle)/sizeof(wchar_t));
+	wcsncpy(tray.szInfoTitle, TEXT(APP_NAME), sizeof(tray.szInfoTitle)/sizeof(wchar_t));
 	tray.dwInfoFlags = NIIF_USER;
 	
 	//Register TaskbarCreated so we can re-add the tray icon if (when) explorer.exe crashes
@@ -84,12 +84,18 @@ void ShowContextMenu(HWND hwnd) {
 	HMENU menu = CreatePopupMenu();
 	
 	//Open/Close
-	int i;
-	wchar_t txt[10];
-	for (i=0; i < wcslen(cdrom); i++) {
-		swprintf(txt, (open[i]?l10n->menu_close:l10n->menu_open), cdrom[i]);
-		InsertMenu(menu, -1, MF_BYPOSITION, SWM_TOGGLE+i, txt);
+	if (cdrom[0] != '\0') {
+		int i;
+		for (i=0; cdrom[i] != '\0'; i++) {
+			wchar_t txt[10];
+			swprintf(txt, (open[cdrom[i]-'A']?l10n->menu_close:l10n->menu_open), cdrom[i]);
+			InsertMenu(menu, -1, MF_BYPOSITION, SWM_TOGGLE+i, txt);
+		}
 	}
+	else {
+		InsertMenu(menu, -1, MF_BYPOSITION|MF_GRAYED, SWM_TOGGLE, l10n->menu_nodrives);
+	}
+	InsertMenu(menu, -1, MF_BYPOSITION|MF_SEPARATOR, 0, NULL);
 	
 	//Check autostart
 	int autostart=0;
@@ -101,7 +107,6 @@ void ShowContextMenu(HWND hwnd) {
 	InsertMenu(menu_options, -1, MF_BYPOSITION, SWM_SETTINGS, l10n->menu_settings);
 	InsertMenu(menu_options, -1, MF_BYPOSITION, SWM_CHECKFORUPDATE, l10n->menu_chkupdate);
 	InsertMenu(menu, -1, MF_BYPOSITION|MF_POPUP, (UINT_PTR)menu_options, l10n->menu_options);
-	InsertMenu(menu, -1, MF_BYPOSITION|MF_SEPARATOR, 0, NULL);
 	
 	//Spin icon (just for fun)
 	InsertMenu(menu, -1, MF_BYPOSITION, SWM_SPIN, l10n->menu_spin);

@@ -1,6 +1,6 @@
 /*
 	Check for update.
-	Copyright (C) 2010  Stefan Sundin (recover89@gmail.com)
+	Copyright (C) 2013  Stefan Sundin (recover89@gmail.com)
 	
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -11,6 +11,25 @@
 #include <wininet.h>
 
 int update = 0;
+
+int OpenUrl(wchar_t *url) {
+	int ret = (INT_PTR)ShellExecute(NULL, L"open", url, NULL, NULL, SW_SHOWDEFAULT);
+	if (ret <= 32) {
+		wchar_t txt[200] = L"Failed to open browser. Copy url to clipboard?\n\n";
+		wcscat_s(txt, sizeof(txt)/sizeof(wchar_t), url);
+		if (MessageBox(NULL,txt,TEXT(APP_NAME),MB_ICONWARNING|MB_YESNO) == IDYES) {
+			int size = (wcslen(url)+1)*sizeof(wchar_t);
+			wchar_t *data = LocalAlloc(LMEM_FIXED, size);
+			memcpy(data, url, size);
+			OpenClipboard(NULL);
+			EmptyClipboard();
+			SetClipboardData(CF_UNICODETEXT, data);
+			CloseClipboard();
+			LocalFree(data);
+		}
+	}
+	return ret;
+}
 
 DWORD WINAPI _CheckForUpdate(LPVOID arg) {
 	int verbose = *(int*)arg;
@@ -35,24 +54,24 @@ DWORD WINAPI _CheckForUpdate(LPVOID arg) {
 		}
 		if (tries >= 10 || verbose) {
 			if (verbose) {
-				Error(L"InternetGetConnectedState()", L"No internet connection.\nPlease check for update manually at "APP_URL, GetLastError(), TEXT(__FILE__), __LINE__);
+				Error(L"InternetGetConnectedState()", L"No internet connection.\nPlease check for update manually on the website.", GetLastError(), TEXT(__FILE__), __LINE__);
 			}
 			return 1;
 		}
 	}
 	
 	//Open connection
-	HINTERNET http = InternetOpen(APP_NAME" - "APP_VERSION, INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
+	HINTERNET http = InternetOpen(APP_NAME L" - " APP_VERSION, INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
 	if (http == NULL) {
 		if (verbose) {
-			Error(L"InternetOpen()", L"Could not establish connection.\nPlease check for update manually at "APP_URL, GetLastError(), TEXT(__FILE__), __LINE__);
+			Error(L"InternetOpen()", L"Could not establish connection.\nPlease check for update manually on the website.", GetLastError(), TEXT(__FILE__), __LINE__);
 		}
 		return 1;
 	}
 	HINTERNET file = InternetOpenUrl(http, (beta?APP_UPDATE_UNSTABLE:APP_UPDATE_STABLE), NULL, 0, INTERNET_FLAG_RELOAD|INTERNET_FLAG_NO_CACHE_WRITE|INTERNET_FLAG_NO_AUTH|INTERNET_FLAG_NO_AUTO_REDIRECT|INTERNET_FLAG_NO_COOKIES|INTERNET_FLAG_NO_UI, 0);
 	if (file == NULL) {
 		if (verbose) {
-			Error(L"InternetOpenUrl()", L"Could not establish connection.\nPlease check for update manually at "APP_URL, GetLastError(), TEXT(__FILE__), __LINE__);
+			Error(L"InternetOpenUrl()", L"Could not establish connection.\nPlease check for update manually on the website.", GetLastError(), TEXT(__FILE__), __LINE__);
 		}
 		InternetCloseHandle(http);
 		return 1;
@@ -62,33 +81,36 @@ DWORD WINAPI _CheckForUpdate(LPVOID arg) {
 	DWORD numread;
 	if (InternetReadFile(file,data,sizeof(data),&numread) == FALSE) {
 		if (verbose) {
-			Error(L"InternetReadFile()", L"Could not read file.\nPlease check for update manually at "APP_URL, GetLastError(), TEXT(__FILE__), __LINE__);
+			Error(L"InternetReadFile()", L"Could not read file.\nPlease check for update manually on the website.", GetLastError(), TEXT(__FILE__), __LINE__);
 		}
 		InternetCloseHandle(file);
 		InternetCloseHandle(http);
 		return 1;
 	}
 	data[numread] = '\0';
-	//Get error code and mime type
-	wchar_t code[4], mime[12];
+	//Get response code
+	wchar_t code[4];
 	DWORD len = sizeof(code);
 	HttpQueryInfo(file, HTTP_QUERY_STATUS_CODE, &code, &len, NULL);
-	len = sizeof(mime);
-	HttpQueryInfo(file, HTTP_QUERY_CONTENT_TYPE, &mime, &len, NULL);
 	//Close connection
 	InternetCloseHandle(file);
 	InternetCloseHandle(http);
 	
-	//Make sure the server returned code 200 and mime text/plain
-	if (wcscmp(code,L"200") || wcscmp(mime,L"text/plain")) {
+	//Make sure the response is valid
+	//strcpy(data, "Version: 1.3"); //This is the format of the new update string
+	//char header[] = "Version: ";
+	if (wcscmp(code,L"200") /*|| strstr(data,header) != data*/) {
 		if (verbose) {
-			MessageBox(NULL, L"Could not determine if an update is available.\n\nPlease check for update manually at "APP_URL, APP_NAME, MB_ICONWARNING|MB_OK);
+			MessageBox(NULL, L"Could not determine if an update is available.\n\nPlease check for update manually on the website.", TEXT(APP_NAME), MB_ICONWARNING|MB_OK);
 		}
 		return 2;
 	}
 	
 	//New version available?
-	if (strcmp(data,APP_VERSION) > 0) {
+	//char *latest = data+strlen(header);
+	//int cmp = strcmp(latest, APP_VERSION);
+	int cmp = strcmp(data, APP_VERSION);
+	if (cmp > 0 || (beta && cmp != 0)) {
 		update = 1;
 		if (verbose) {
 			SendMessage(g_hwnd, WM_COMMAND, SWM_UPDATE, 0);
@@ -103,7 +125,7 @@ DWORD WINAPI _CheckForUpdate(LPVOID arg) {
 	else {
 		update = 0;
 		if (verbose) {
-			MessageBox(NULL, l10n->update_nonew, APP_NAME, MB_ICONINFORMATION|MB_OK);
+			MessageBox(NULL, l10n->update_nonew, TEXT(APP_NAME), MB_ICONINFORMATION|MB_OK);
 		}
 	}
 	return 0;

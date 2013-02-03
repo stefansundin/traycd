@@ -1,5 +1,6 @@
 
 struct strings {
+	wchar_t *menu_nodrives;
 	wchar_t *menu_open;
 	wchar_t *menu_close;
 	wchar_t *menu_options;
@@ -23,13 +24,13 @@ struct strings {
 #include "fa-IR/strings.h"
 
 struct {
-	wchar_t *code;
+	char *code;
 	struct strings *strings;
 } languages[] = {
-	{L"en-US", &en_US},
-	{L"es-ES", &es_ES},
-	{L"gl-ES", &gl_ES},
-	{L"fa-IR", &fa_IR},
+	{"en-US", &en_US},
+	{"es-ES", &es_ES},
+	{"gl-ES", &gl_ES},
+	{"fa-IR", &fa_IR},
 	{NULL},
 };
 

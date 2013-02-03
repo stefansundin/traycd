@@ -8,8 +8,9 @@
 */
 
 struct strings gl_ES = {
- /* menu_open      */ L"Abrir %c:",
- /* menu_close     */ L"Pechar %c:",
+ /* menu_nodrives  */ L"Non hai unidades detectadas",
+ /* menu_open      */ L"Abrir %hc:",
+ /* menu_close     */ L"Pechar %hc:",
  /* menu_options   */ L"Preferencias",
  /* menu_autostart */ L"Arrancar ó inicio",
  /* menu_settings  */ L"Abrir configuración",
@@ -19,7 +20,7 @@ struct strings gl_ES = {
  /* menu_about     */ L"Acerca de",
  /* menu_exit      */ L"Saír",
  /* update_balloon */ L"Nova versión dispoñíbel!",
- /* update_dialog  */ L"Unha nova versión está dispoñíbel.\nQueres ir á páxina web?\n\nPodes desactivar a comprobación de actualizacións na configuración.",
+ /* update_dialog  */ L"Unha nova versión está dispoñíbel. Queres ir á páxina web?\n\nPodes desactivar a comprobación de actualizacións na configuración.",
  /* update_nonew   */ L"Non hai actualizacións.",
  /* about_title    */ L"Acerca de " APP_NAME,
  /* about          */ APP_NAME " - " APP_VERSION "\n\

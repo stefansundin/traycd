@@ -1,6 +1,6 @@
 /*
 	Autostart functions.
-	Copyright (C) 2010  Stefan Sundin (recover89@gmail.com)
+	Copyright (C) 2013  Stefan Sundin (recover89@gmail.com)
 	
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@ void CheckAutostart(int *on) {
 	wchar_t value[MAX_PATH+10] = L"";
 	DWORD len = sizeof(value);
 	RegOpenKeyEx(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_QUERY_VALUE, &key);
-	RegQueryValueEx(key, APP_NAME, NULL, NULL, (LPBYTE)value, &len);
+	RegQueryValueEx(key, TEXT(APP_NAME), NULL, NULL, (LPBYTE)value, &len);
 	RegCloseKey(key);
 	//Compare
 	wchar_t path[MAX_PATH];
@@ -43,7 +43,7 @@ void SetAutostart(int on) {
 		//Set autostart
 		wchar_t value[MAX_PATH+10];
 		swprintf(value,L"\"%s\"",path);
-		error = RegSetValueEx(key, APP_NAME, 0, REG_SZ, (LPBYTE)value, (wcslen(value)+1)*sizeof(wchar_t));
+		error = RegSetValueEx(key, TEXT(APP_NAME), 0, REG_SZ, (LPBYTE)value, (wcslen(value)+1)*sizeof(wchar_t));
 		if (error != ERROR_SUCCESS) {
 			Error(L"RegSetValueEx('"APP_NAME"')", L"SetAutostart()", error, TEXT(__FILE__), __LINE__);
 			return;
@@ -51,7 +51,7 @@ void SetAutostart(int on) {
 	}
 	else {
 		//Remove
-		error = RegDeleteValue(key, APP_NAME);
+		error = RegDeleteValue(key, TEXT(APP_NAME));
 		if (error != ERROR_SUCCESS) {
 			Error(L"RegDeleteValue('"APP_NAME"')", L"SetAutostart()", error, TEXT(__FILE__), __LINE__);
 			return;
