@@ -16,9 +16,9 @@ int OpenUrl(wchar_t *url) {
 	int ret = (INT_PTR)ShellExecute(NULL, L"open", url, NULL, NULL, SW_SHOWDEFAULT);
 	if (ret <= 32) {
 		wchar_t txt[200] = L"Failed to open browser. Copy url to clipboard?\n\n";
-		wcscat_s(txt, sizeof(txt)/sizeof(wchar_t), url);
+		wcscat_s(txt, ARRAY_SIZE(txt), url);
 		if (MessageBox(NULL,txt,TEXT(APP_NAME),MB_ICONWARNING|MB_YESNO) == IDYES) {
-			int size = (wcslen(url)+1)*sizeof(wchar_t);
+			int size = (wcslen(url)+1)*sizeof(url[0]);
 			wchar_t *data = LocalAlloc(LMEM_FIXED, size);
 			memcpy(data, url, size);
 			OpenClipboard(NULL);
@@ -37,11 +37,11 @@ DWORD WINAPI _CheckForUpdate(LPVOID arg) {
 	
 	//Check if we should check for beta
 	wchar_t path[MAX_PATH];
-	GetModuleFileName(NULL, path, sizeof(path)/sizeof(wchar_t));
+	GetModuleFileName(NULL, path, ARRAY_SIZE(path));
 	PathRemoveFileSpec(path);
 	wcscat(path, L"\\"APP_NAME".ini");
 	wchar_t txt[10];
-	GetPrivateProfileString(L"Update", L"Beta", L"0", txt, sizeof(txt)/sizeof(wchar_t), path);
+	GetPrivateProfileString(L"Update", L"Beta", L"0", txt, ARRAY_SIZE(txt), path);
 	int beta = _wtoi(txt);
 	
 	//Check if we are connected to the internet
@@ -116,7 +116,7 @@ DWORD WINAPI _CheckForUpdate(LPVOID arg) {
 			SendMessage(g_hwnd, WM_COMMAND, SWM_UPDATE, 0);
 		}
 		else {
-			wcsncpy(tray.szInfo, l10n->update_balloon, sizeof(tray.szInfo)/sizeof(wchar_t));
+			wcsncpy(tray.szInfo, l10n->update_balloon, ARRAY_SIZE(tray.szInfo));
 			tray.uFlags |= NIF_INFO;
 			UpdateTray();
 			tray.uFlags ^= NIF_INFO;

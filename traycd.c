@@ -19,7 +19,7 @@
 
 //App
 #define APP_NAME            "TrayCD"
-#define APP_VERSION         "1.3b1"
+#define APP_VERSION         "1.3"
 #define APP_URL             L"http://code.google.com/p/traycd/"
 #define APP_UPDATE_STABLE   L"http://traycd.googlecode.com/svn/wiki/latest-stable.txt"
 #define APP_UPDATE_UNSTABLE L"http://traycd.googlecode.com/svn/wiki/latest-unstable.txt"
@@ -47,6 +47,7 @@
 #endif
 
 //Boring stuff
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 HINSTANCE g_hinst = NULL;
 HWND g_hwnd = NULL;
@@ -74,11 +75,11 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	g_hwnd = CreateWindowEx(0, wnd.lpszClassName, TEXT(APP_NAME), 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, hInst, NULL);
 	
 	//Load settings
-	GetModuleFileNameA(NULL, inipath, sizeof(inipath)/sizeof(char));
+	GetModuleFileNameA(NULL, inipath, ARRAY_SIZE(inipath));
 	PathRemoveFileSpecA(inipath);
 	strcat(inipath, "\\"APP_NAME".ini");
 	char txt[30];
-	GetPrivateProfileStringA(APP_NAME, "Language", "en-US", txt, sizeof(txt)/sizeof(char), inipath);
+	GetPrivateProfileStringA(APP_NAME, "Language", "en-US", txt, ARRAY_SIZE(txt), inipath);
 	int i;
 	for (i=0; languages[i].code != NULL; i++) {
 		if (!strcmp(txt,languages[i].code)) {
@@ -92,7 +93,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR szCmdLine, in
 	UpdateTray();
 	
 	//Check for update
-	GetPrivateProfileStringA("Update", "CheckOnStartup", "0", txt, sizeof(txt)/sizeof(char), inipath);
+	GetPrivateProfileStringA("Update", "CheckOnStartup", "0", txt, ARRAY_SIZE(txt), inipath);
 	if (atoi(txt)) {
 		CheckForUpdate(0);
 	}
@@ -111,7 +112,7 @@ void DetectDrives() {
 	
 	//Load static list
 	char drives[30];
-	GetPrivateProfileStringA(APP_NAME, "Drives", "", drives, sizeof(drives)/sizeof(char), inipath);
+	GetPrivateProfileStringA(APP_NAME, "Drives", "", drives, ARRAY_SIZE(drives), inipath);
 	if (drives[0] != '\0') {
 		int i = 0;
 		char *x;
@@ -163,7 +164,7 @@ DWORD WINAPI _ToggleCD(LPVOID arg) {
 	else {
 		DWORD bytesReturned; //Not used
 		PREVENT_MEDIA_REMOVAL pmr = { FALSE }; //This is really just a BOOL
-		BOOL result = DeviceIoControl(device, IOCTL_STORAGE_MEDIA_REMOVAL, &pmr, sizeof(PREVENT_MEDIA_REMOVAL), NULL, 0, &bytesReturned, NULL);
+		BOOL result = DeviceIoControl(device, IOCTL_STORAGE_MEDIA_REMOVAL, &pmr, sizeof(pmr), NULL, 0, &bytesReturned, NULL);
 		if (result == 0) {
 			#ifdef DEBUG
 			Error(L"DeviceIoControl()", L"Unlocking CD-ROM failed.", GetLastError(), TEXT(__FILE__), __LINE__);

@@ -37,10 +37,10 @@ int InitTray() {
 	tray.uFlags = NIF_MESSAGE|NIF_ICON|NIF_TIP;
 	tray.hWnd = g_hwnd;
 	tray.uCallbackMessage = WM_TRAY;
-	wcsncpy(tray.szTip, TEXT(APP_NAME), sizeof(tray.szTip)/sizeof(wchar_t));
+	wcsncpy(tray.szTip, TEXT(APP_NAME), ARRAY_SIZE(tray.szTip));
 	//Balloon tooltip
 	tray.uTimeout = 10000;
-	wcsncpy(tray.szInfoTitle, TEXT(APP_NAME), sizeof(tray.szInfoTitle)/sizeof(wchar_t));
+	wcsncpy(tray.szInfoTitle, TEXT(APP_NAME), ARRAY_SIZE(tray.szInfoTitle));
 	tray.dwInfoFlags = NIIF_USER;
 	
 	//Register TaskbarCreated so we can re-add the tray icon if (when) explorer.exe crashes

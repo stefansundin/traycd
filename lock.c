@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
 	printf("%s cd-rom drive ... ", (lock?"Locking":"Unlocking")); fflush(stdout);
 	DWORD bytesReturned; //Not used
 	PREVENT_MEDIA_REMOVAL pmr = { lock }; //This is really just a BOOL
-	BOOL result = DeviceIoControl(device, IOCTL_STORAGE_MEDIA_REMOVAL, &pmr, sizeof(PREVENT_MEDIA_REMOVAL), NULL, 0, &bytesReturned, NULL);
+	BOOL result = DeviceIoControl(device, IOCTL_STORAGE_MEDIA_REMOVAL, &pmr, sizeof(pmr), NULL, 0, &bytesReturned, NULL);
 	if (result == 0) {
 		printf("DeviceIoControl() failed. GetLastError(): %d.\n", GetLastError());
 	}
