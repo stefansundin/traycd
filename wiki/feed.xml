@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<id>urn:uuid:fd9e875d-86de-4e51-9166-947048552b29</id>
+	<title>TrayCD</title>
+	<link href="http://traycd.googlecode.com/svn/wiki/feed.xml" rel="self" />
+	<link href="http://code.google.com/p/traycd/" />
+	<updated>2010-12-30T21:20:00Z</updated>
+	<author>
+		<name>Stefan Sundin</name>
+		<uri>http://stefansundin.com/</uri>
+		<email>recover89@gmail.com</email>
+	</author>
+
+	<entry>
+		<id>urn:uuid:242a3189-6873-4a13-be72-f8fe1cab5279</id>
+		<title>How to compile my programs</title>
+		<link href="http://code.google.com/p/traycd/" />
+		<updated>2010-12-30T21:20:00Z</updated>
+		<author><name>Stefan Sundin</name></author>
+		<content type="html">
+I have made a video explaining how to compile SuperF4, which is another program of mine. The instructions also work just as well with TrayCD. This might be of interest if you are learning programming and want to make your own modifications to TrayCD. Go to the &lt;a href="http://code.google.com/p/traycd/wiki/Build">Build&lt;/a> wiki page to see it.&lt;br/>
+&lt;br/>
+&lt;a href="http://code.google.com/p/traycd/">&lt;img src="http://traycd.googlecode.com/svn/wiki/website.png"/> Visit the website&lt;/a>&lt;br/>
+&lt;a href="http://www.youtube.com/watch?v=4ENwQxSr_So">&lt;img src="http://www.youtube.com/favicon.ico"/> Watch the video on YouTube&lt;/a>&lt;br/>
+&lt;a href="http://groups.google.com/group/recovers-tools">&lt;img src="http://traycd.googlecode.com/svn/wiki/groups.png"/> Discuss in the forum&lt;/a> (no registration required)&lt;br/>
+&lt;a href="http://stefansundin.com/">&lt;img src="http://traycd.googlecode.com/svn/wiki/website.png"/> Visit the author's website&lt;/a>
+		</content>
+	</entry>
+
+	<entry>
+		<id>urn:uuid:a19a27be-05be-4e49-be9b-ec5ac578fd3e</id>
+		<title>TrayCD - 1.2</title>
+		<link href="http://code.google.com/p/traycd/" />
+		<updated>2010-11-19T22:45:00Z</updated>
+		<author><name>Stefan Sundin</name></author>
+		<content type="html">
+Released 1.2.&lt;br/>
+This release fixes a couple of minor bugs. The new version is also available in 64-bit. The installer will automatically install the correct executable. New language: Farsi by Samad Alaamati. For more details, see the changelog below.&lt;br/>
+&lt;br/>
+&lt;u>Changelog:&lt;/u>
+&lt;ul>
+&lt;li>Added 64-bit executable. The installer will automatically install the correct executable.&lt;/li>
+&lt;li>Added manual update check to the tray menu.&lt;/li>
+&lt;li>Fixed the &lt;tt>Shell_NotifyIcon&lt;/tt> error that appeared for some when TrayCD was on autostart.&lt;/li>
+&lt;/ul>
+&lt;a href="http://code.google.com/p/traycd/">&lt;img src="http://traycd.googlecode.com/svn/wiki/website.png"/> Visit the website&lt;/a>&lt;br/>
+&lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2.exe">&lt;img src="http://traycd.googlecode.com/svn/wiki/down.png"/> Download installer&lt;/a>
+ - Archive: &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2.7z">English&lt;/a> (&lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2%20%28x64%29.7z">x64&lt;/a>)
+ - &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2%20%28Spanish%29.7z">Spanish&lt;/a> (&lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2%20%28Spanish%2C%20x64%29.7z">x64&lt;/a>)
+ - &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2%20%28Galician%29.7z">Galician&lt;/a> (&lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2%20%28Galician%2C%20x64%29.7z">x64&lt;/a>) - &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2%20%28Farsi%29.7z">Farsi&lt;/a> (&lt;a href="http://traycd.googlecode.com/files/TrayCD-1.2%20%28Farsi%2C%20x64%29.7z">x64&lt;/a>)&lt;br/>
+&lt;a href="http://groups.google.com/group/recovers-tools">&lt;img src="http://traycd.googlecode.com/svn/wiki/groups.png"/> Discuss in the forum&lt;/a> (no registration required)&lt;br/>
+&lt;a href="http://stefansundin.com/">&lt;img src="http://traycd.googlecode.com/svn/wiki/website.png"/> Visit the author's website&lt;/a>
+		</content>
+	</entry>
+
+	<entry>
+		<id>urn:uuid:1dbefaed-6e66-4c90-a008-1d859482ecda</id>
+		<title>lock.exe</title>
+		<link href="http://code.google.com/p/traycd/" />
+		<updated>2009-12-25T22:00:00Z</updated>
+		<content type="html">
+Uploaded a small console program, lock.exe, that can lock/unlock cd-rom drives. A locked cd-rom drive can't be ejected. Why would you need this? I do not know.&lt;br/>
+&lt;br/>
+&lt;a href="http://code.google.com/p/traycd/">&lt;img src="http://traycd.googlecode.com/svn/wiki/website.png"/> Visit the website&lt;/a>&lt;br/>
+&lt;a href="http://traycd.googlecode.com/files/lock.exe">&lt;img src="http://traycd.googlecode.com/svn/wiki/down.png"/> Download lock.exe&lt;/a>&lt;br/>
+&lt;a href="http://groups.google.com/group/recovers-tools">&lt;img src="http://traycd.googlecode.com/svn/wiki/groups.png"/> Discuss in the forum&lt;/a> (no registration required)
+		</content>
+	</entry>
+
+	<entry>
+		<id>urn:uuid:820b0be7-bb73-4321-b9a0-96c96325bf7b</id>
+		<title>TrayCD - 1.1</title>
+		<link href="http://code.google.com/p/traycd/" />
+		<updated>2009-08-23T22:00:00Z</updated>
+		<content type="html">
+Released 1.1.&lt;br/>
+This release fixes many small bugs. No major feature added. New language: Galician by Alexander De Sousa. Alexander has also helped me fix some bugs, thanks! :)&lt;br/>
+&lt;br/>
+&lt;u>Changelog:&lt;/u>
+&lt;ul>
+&lt;li>Language can now be changed in TrayCD.ini.&lt;/li>
+&lt;li>A lot of small bug fixes.&lt;/li>
+&lt;/ul>
+&lt;a href="http://code.google.com/p/traycd/">&lt;img src="http://traycd.googlecode.com/svn/wiki/website.png"/> Visit the website&lt;/a>&lt;br/>
+&lt;a href="http://traycd.googlecode.com/files/TrayCD-1.1.exe">&lt;img src="http://traycd.googlecode.com/svn/wiki/down.png"/> Download installer&lt;/a> - Archive: &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.1.7z">English&lt;/a> - &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.1%20%28Spanish%29.7z">Spanish&lt;/a> - &lt;a href="http://traycd.googlecode.com/files/TrayCD-1.1%20%28Galician%29.7z">Galician&lt;/a>&lt;br/>
+&lt;a href="http://groups.google.com/group/recovers-tools">&lt;img src="http://traycd.googlecode.com/svn/wiki/groups.png"/> Discuss in the forum&lt;/a> (no registration required)
+		</content>
+	</entry>
+</feed>
